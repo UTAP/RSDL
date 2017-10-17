@@ -1,14 +1,13 @@
 #ifndef __RSDL_H__
 #define __RSDL_H__
-
 #include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
+#include <SDL2_ttf/SDL_ttf.h>
 #include <string>
 #include <iostream>
 #include <cstdlib>
 #include <map>
-#include <SDL2_image/SDL_image.h>
-#include <SDL2_ttf/SDL_ttf.h>
-
+void Delay(int milis);
 class RGB {
 public:
 	RGB(int r, int g, int b) {
@@ -18,9 +17,9 @@ public:
 		green = g;
 		blue = b;
 	}
-	int red;
-	int green;
-	int blue;
+	Uint8 red;
+	Uint8 green;
+	Uint8 blue;
 };
 
 const RGB WHITE(255, 255, 255);
@@ -31,6 +30,22 @@ const RGB CYAN(0, 255, 255);
 const RGB GREEN(0, 255, 0);
 const RGB BLUE(0, 0, 255);
 const RGB BLACK(0, 0, 0);
+
+enum EventType {NA,LCLICK,RCLICK,LRELEASE,RRELEASE,MMOTION,KEY_PRESS,QUIT};
+
+class Event{
+	public:
+		Event();
+		Event(SDL_Event _sdlEvent);
+		EventType type();
+		int mouseX();
+		int mouseY();
+		int relativeMouseX();
+		int relativeMouseY();
+		char pressedKey();
+	private:
+		SDL_Event sdlEvent;
+};
 
 class window {
 public:
@@ -46,6 +61,8 @@ public:
   void draw_line(int x1, int y1, int x2, int y2, RGB color=WHITE);
   void draw_point(int x, int y, RGB color=WHITE);
   void draw_rect(int x, int y, int width, int height, RGB color=WHITE);
+	void clear();
+	Event pollForEvent();
 private:
   const int WINDOW_WIDTH;
   const int WINDOW_HEIGHT;
@@ -57,15 +74,5 @@ private:
 	void dump_err() { std::cerr << SDL_GetError() << '\n'; }
 	void init();
 };
-
-#define HANDLE(A)   SDL_Event e; while (SDL_PollEvent(&e) != 0) { A }
-#define QUIT(Code) if (e.type == SDL_QUIT) { Code ; }
-#define LCLICK(Code) if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) { int mouse_x = e.button.x; int mouse_y = e.button.y; Code ; }
-#define RCLICK(Code) if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT) { int mouse_x = e.button.x; int mouse_y = e.button.y; Code ; }
-#define KEY_PRESS(Char, Code) if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_##Char) { Code ; }
-#define LRELEASE(Code) if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) { int mouse_x = e.button.x; int mouse_y = e.button.y; Code ; }
-#define RRELEASE(Code) if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT) { int mouse_x = e.button.x; int mouse_y = e.button.y; Code ; }
-
-#define DELAY(Millis) SDL_Delay(Millis)
 
 #endif

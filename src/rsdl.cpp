@@ -4,6 +4,85 @@
 
 using namespace std;
 
+void Delay(int milis)
+{
+  SDL_Delay(milis);
+}
+
+Event::Event(SDL_Event _sdlEvent)
+{
+	sdlEvent = _sdlEvent;
+}
+
+EventType Event::type()
+{
+	SDL_Event e = sdlEvent;
+  try{
+    if (e.type == SDL_QUIT)
+  		return QUIT;
+  	if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
+  		return LCLICK;
+  	if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT)
+  		return RCLICK;
+  	if (e.type == SDL_KEYDOWN )
+  		return KEY_PRESS;
+  	if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT)
+  		return LRELEASE;
+  	if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT)
+  		return RRELEASE;
+    if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT)
+  		return RRELEASE;
+    if (e.type == SDL_MOUSEMOTION)
+      return MMOTION;
+  }catch(...){
+    return NA;
+  }
+	return NA;
+}
+
+int Event::mouseX()
+{
+  if(type() == KEY_PRESS || type() == QUIT || type() == NA)
+    return -1;
+  if(type() == MMOTION)
+    return sdlEvent.motion.x;
+  else
+	  return sdlEvent.button.x;
+}
+
+int Event::mouseY()
+{
+  if(type() == KEY_PRESS || type() == QUIT || type() == NA)
+    return -1;
+  if(type() == MMOTION)
+    return sdlEvent.motion.y;
+  else
+	  return sdlEvent.button.y;
+}
+
+int Event::relativeMouseX()
+{
+  if(type() != MMOTION)
+    return 0;
+  else
+	 return sdlEvent.motion.xrel;
+}
+
+int Event::relativeMouseY()
+{
+  if(type() != MMOTION)
+    return 0;
+  else
+	  return sdlEvent.motion.yrel;
+}
+
+char Event::pressedKey()
+{
+  if(type() != KEY_PRESS)
+    return -1;
+	return sdlEvent.key.keysym.sym;
+}
+
 void window::init(){
     if (SDL_Init(0) < 0)
 		throw "SDL Init Fail";
@@ -25,8 +104,6 @@ window::window(int width, int height, std::string title):WINDOW_WIDTH(width),WIN
 		throw string("Window could not be created! SDL_Error: ") + SDL_GetError();
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     SDL_SetWindowTitle(win, title.c_str());
-    // set_color(BLACK);
-    fill_rect(0,0,width,height);
     update_screen();
 }
 
@@ -38,7 +115,7 @@ window::~window(){
 }
 
 void window::show_text(string input, int x, int y, RGB color, string font_addr, int size){
-    SDL_Color textColor = { color.red, color.green, color.blue, 0 };
+    SDL_Color textColor = { color.red, color.green, color.blue,};
     stringstream ss;
     ss << size;
     TTF_Font* font = fonts_cache[font_addr+":"+ss.str()];
@@ -58,6 +135,9 @@ void window::set_color(RGB color){
 	SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
 }
 
+void window::clear(){
+  SDL_RenderClear(renderer);
+}
 void window::draw_bmp(string filename, int x, int y, int width, int height){
 	SDL_Texture* res = texture_cache[filename];
 	if (res == NULL){
@@ -130,4 +210,14 @@ void window::draw_rect(int x, int y, int width, int height, RGB color){
     draw_line(x,y,x,y+height,color);
     draw_line(x,y+height,x+width,y+height,color);
     draw_line(x+width,y,x+width,y+height,color);
+}
+
+Event window::pollForEvent(){
+  SDL_Event event;
+  while(SDL_PollEvent(&event) != 0){
+    Event e(event);
+    if(e.type() != 0)
+      return e;
+  }
+  return event;
 }
