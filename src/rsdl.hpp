@@ -1,8 +1,6 @@
 #ifndef __RSDL_H__
 #define __RSDL_H__
-#include <SDL2/SDL.h>
-#include <SDL2_image/SDL_image.h>
-#include <SDL2_ttf/SDL_ttf.h>
+#include "sdlHeaders.hpp"
 #include <string>
 #include <iostream>
 #include <cstdlib>
