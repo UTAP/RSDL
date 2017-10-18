@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <vector>
 #include <cmath>
-#include <thread>
 #include <string>
 
 #define WINDOW_WIDTH 1440
