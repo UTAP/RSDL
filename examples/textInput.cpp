@@ -4,20 +4,21 @@
 #include <cmath>
 #include <string>
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
-#define BACK_SPACE 8
-#define RETURN 13
-
 using namespace std;
 
-string getCursor(int& age)
-{
-  age++;
-  if(age > 50)
-    age = 0;
-  return age > 25 ? "|" : "";
-}
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+#define WINDOW_TITLE "RSDL Tutorial"
+#define BACK_SPACE 8
+#define RETURN 13
+#define USER_INPUT_SIZE_MAX 10
+
+#define TICK_DURATION 10
+#define CURSOR_AGE 50
+
+#define IMG_SQUARE "examples/assets/square.png"
+#define IMG_BACKGROUND_IMG "examples/assets/background.jpg"
+#define FONT_FREESANS "examples/assets/FreeSans.ttf"
 
 struct Square{
   int x,y;
@@ -25,79 +26,116 @@ struct Square{
   int width,height;
 };
 
-bool collision_with_horizontal_border(Square square)
+Square create_square(int x, int y, int v_x, int v_y, int width, int height)
 {
-  return square.y<= 0 || square.y > WINDOW_HEIGHT-square.height;
+  Square square;
+  square.x = x;
+  square.y = y;
+  square.v_x = v_x;
+  square.v_y = v_y;
+  square.width = width;
+  square.height = height;
 }
 
-bool collision_with_vertical_border(Square square)
+void collide_with_horizontal_border(Square& square)
 {
-  return square.x <= 0 || square.x > WINDOW_WIDTH-square.width;
+  if (square.y<= 0 || square.y > (WINDOW_HEIGHT - square.height) )
+    square.v_y = -square.v_y;
 }
 
+void collide_with_vertical_border(Square& square)
+{
+  if (square.x <= 0 || square.x > (WINDOW_WIDTH - square.width) )
+    square.v_x = -square.v_x;
+}
 
 void move_square(Square& square){
   square.x += square.v_x;
   square.y += square.v_y;
-  if(collision_with_horizontal_border(square))
-    square.v_y = -square.v_y;
-  if(collision_with_vertical_border(square))
-    square.v_x = -square.v_x;
+
+  collide_with_horizontal_border(square);
+  collide_with_vertical_border(square);
 }
 
-void draw_in_window(window& win, string inputStringWithCursor, Square square)
+void draw_string(Window& win, string text)
 {
-  win.draw_bg("examples/assets/background.jpg",0,0);
-  win.draw_png("examples/assets/square.png", square.x, square.y, square.width, square.height,45);
-  win.fill_rect(100, 100, 400 - 1, 50 - 1, RED);
-  win.show_text(inputStringWithCursor, 100, 100, WHITE, "examples/assets/FreeSans.ttf",30);
-  win.update_screen();
-  win.clear();
+  win.show_text(text, 100, 100, WHITE, FONT_FREESANS, 30);
 }
 
-void erase_last_char(string& inputString)
+void draw_square(window& win, Square square)
 {
-  if(inputString.size() > 0)
-      inputString.erase(inputString.size()-1);
+  win.draw_bg(IMG_BACKGROUND, 0, 0);
+  win.draw_png(IMG_SQUARE, square.x, square.y, square.width, square.height, 45);
+  win.fill_rect(100, 100, (400 - 1), (50 - 1), RED);
 }
 
-void add_char(string& inputString, char c)
+string getCursor(int& age)
 {
-  if(inputString.size() < 10)
-    inputString+= c;
+  age++;
+  if(age > CURSOR_AGE)
+    age = 0;
+  return age > CURSOR_AGE/2 ? "|" : "";
 }
 
-string get_input(window& win){
-	string inputString = "";
-	const int tickDuration = 10;
+string prepare_output_text(string input_string)
+{
+  return "  Your name: " + input_string + getCursor(age);
+}
+
+void erase_last_char(string& input_string)
+{
+  if(input_string.size() > 0)
+      input_string.erase(input_string.size() - 1);
+}
+
+void add_char(string& input_string, char c)
+{
+  if(input_string.size() < USER_INPUT_SIZE_MAX)
+    input_string += c;
+}
+
+void process_rsdl_input(windows& win, bool& quit_flag, string& input_string)
+{
+  Event event = win.pollForEvent();
+  if(event.type() == KEY_PRESS)
+  {
+    if(event.pressedKey() == BACK_SPACE)
+      erase_last_char(input_string);
+    else if(event.pressedKey() == RETURN)
+        quit_flag = true;
+    else
+      add_char(input_string, event.pressedKey());
+  }
+}
+
+void run_input_capture_window(window& win, string& input_string){
 	int age = 0;
-  Square square;
-  square.x = 50;
-  square.y = 60;
-  square.v_x = 1;
-  square.v_y = -1;
-  square.width = 40;
-  square.height = 40;
-	while(true) {
-    Event event = win.pollForEvent();
-		if(event.type() == KEY_PRESS)
-		{
-			if(event.pressedKey() == BACK_SPACE)
-        erase_last_char(inputString);
-			else if(event.pressedKey() == RETURN)
-					break;
-			else
-        add_char(inputString, event.pressedKey());
-		}
-    move_square(square);
-    draw_in_window(win, "  Your name: "+inputString+getCursor(age), square);
-		Delay(tickDuration);
-	}
-	return inputString;
-}
+  Square square = create_square(50, 60, 1, -1, 40, 40);
+  bool quit_flag = false;
 
+	while(!quit_flag) {
+    //input
+    process_rsdl_input(win, quit_flag, input_string);
+    
+    //logic
+    move_square(square);
+
+    //draw
+    win.clear();
+    draw_string(win, prepare_output_text(input_string));
+    draw_square(win, square);
+    win.update_screen();
+    
+		Delay(TICK_DURATION);
+  }
+  
+	return input_string;
+}
 
 int main() {
-  window win(WINDOW_WIDTH, WINDOW_HEIGHT,"RSDL");
-	cout<<get_input(win)<<endl;
+  window win(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
+  string input_string;
+
+  run_input_capture_window(win, string);
+	cout<<input_string<<endl;
 }
