@@ -136,8 +136,10 @@ void window::set_color(RGB color){
 }
 
 void window::clear(){
+  SDL_SetRenderDrawColor(renderer,0,0,0,0);
   SDL_RenderClear(renderer);
 }
+
 void window::draw_bmp(string filename, int x, int y, int width, int height){
 	SDL_Texture* res = texture_cache[filename];
 	if (res == NULL){
