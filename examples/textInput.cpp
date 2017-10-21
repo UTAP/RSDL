@@ -63,7 +63,7 @@ void draw_string(window& win, string text)
   win.show_text(text, 100, 100, WHITE, FONT_FREESANS, 30);
 }
 
-void draw_square(window& win, Square square)
+void draw_(window& win, Square square)
 {
   win.draw_bg(IMG_BACKGROUND, 0, 0);
   win.draw_png(IMG_SQUARE, square.x, square.y, square.width, square.height, 45);
@@ -103,7 +103,7 @@ void process_rsdl_input(window& win, bool& quit_flag, string& input_string)
 
 string run_input_capture_window(window& win, string& input_string)
 {
-  Square square = create_square(50, 60, 1, -1, 40, 40);   
+  Square square = create_square(50, 60, 1, -1, 40, 40);
   bool quit_flag = false;
 
 	while(!quit_flag) {
