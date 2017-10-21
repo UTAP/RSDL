@@ -2,3 +2,4 @@
 tests/
 *.o
 *.out
+*.md

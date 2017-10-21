@@ -17,7 +17,7 @@ using namespace std;
 #define CURSOR_AGE 50
 
 #define IMG_SQUARE "examples/assets/square.png"
-#define IMG_BACKGROUND_IMG "examples/assets/background.jpg"
+#define IMG_BACKGROUND "examples/assets/background.jpg"
 #define FONT_FREESANS "examples/assets/FreeSans.ttf"
 
 struct Square{
@@ -35,6 +35,7 @@ Square create_square(int x, int y, int v_x, int v_y, int width, int height)
   square.v_y = v_y;
   square.width = width;
   square.height = height;
+  return square;
 }
 
 void collide_with_horizontal_border(Square& square)
@@ -57,7 +58,7 @@ void move_square(Square& square){
   collide_with_vertical_border(square);
 }
 
-void draw_string(Window& win, string text)
+void draw_string(window& win, string text)
 {
   win.show_text(text, 100, 100, WHITE, FONT_FREESANS, 30);
 }
@@ -69,17 +70,9 @@ void draw_square(window& win, Square square)
   win.fill_rect(100, 100, (400 - 1), (50 - 1), RED);
 }
 
-string getCursor(int& age)
-{
-  age++;
-  if(age > CURSOR_AGE)
-    age = 0;
-  return age > CURSOR_AGE/2 ? "|" : "";
-}
-
 string prepare_output_text(string input_string)
 {
-  return "  Your name: " + input_string + getCursor(age);
+  return "  Your name: " + input_string;
 }
 
 void erase_last_char(string& input_string)
@@ -94,7 +87,7 @@ void add_char(string& input_string, char c)
     input_string += c;
 }
 
-void process_rsdl_input(windows& win, bool& quit_flag, string& input_string)
+void process_rsdl_input(window& win, bool& quit_flag, string& input_string)
 {
   Event event = win.pollForEvent();
   if(event.type() == KEY_PRESS)
@@ -108,34 +101,35 @@ void process_rsdl_input(windows& win, bool& quit_flag, string& input_string)
   }
 }
 
-void run_input_capture_window(window& win, string& input_string){
-	int age = 0;
-  Square square = create_square(50, 60, 1, -1, 40, 40);
+string run_input_capture_window(window& win, string& input_string)
+{
+  Square square = create_square(50, 60, 1, -1, 40, 40);   
   bool quit_flag = false;
 
 	while(!quit_flag) {
     //input
-    process_rsdl_input(win, quit_flag, input_string);
-    
+    process_rsdl_input(win, quit_flag,input_string);
+
     //logic
     move_square(square);
 
     //draw
     win.clear();
-    draw_string(win, prepare_output_text(input_string));
     draw_square(win, square);
+    draw_string(win, prepare_output_text(input_string));
     win.update_screen();
-    
 		Delay(TICK_DURATION);
   }
-  
+
 	return input_string;
 }
 
-int main() {
+int main()
+{
   window win(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
-  string input_string;
 
-  run_input_capture_window(win, string);
+  string input_string;
+  run_input_capture_window(win, input_string);
+
 	cout<<input_string<<endl;
 }
