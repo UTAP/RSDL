@@ -8,10 +8,10 @@ using namespace std;
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
+#define MAX_STRING_LENGTH 10
 #define WINDOW_TITLE "RSDL Tutorial"
 #define BACK_SPACE 8
 #define RETURN 13
-#define USER_INPUT_SIZE_MAX 10
 
 #define TICK_DURATION 10
 #define CURSOR_AGE 50
@@ -40,7 +40,8 @@ Square create_square(int x, int y, int v_x, int v_y, int width, int height) {
 }
 
 //This segment reflects the square when it reaches the borders.
-void collide_with_horizontal_border(Square& square) {
+void collide_with_horizontal_border(Square& square)
+{
   if (square.y<= 0 || square.y > (WINDOW_HEIGHT - square.height) )
     square.v_y = -square.v_y;
 }
@@ -52,7 +53,8 @@ void collide_with_vertical_border(Square& square)
 }
 
 //Move the square for one frame.
-void move_square(Square& square) {
+void move_square(Square& square)
+{
   square.x += square.v_x;
   square.y += square.v_y;
 
@@ -61,28 +63,33 @@ void move_square(Square& square) {
 }
 
 //One simple function to draw a string on screen.
-void draw_string(window& win, string text) {
+void draw_string(window& win, string text)
+{
   win.show_text(text, 100, 100, WHITE, FONT_FREESANS, 30);
 }
 
 //An example of use cases of RSDL functions.
-void draw_all_shapes(window& win, Square square) {
+void draw_dynamic_background(window& win, Square square)
+{
   win.draw_bg(IMG_BACKGROUND, 0, 0);
   win.draw_png(IMG_SQUARE, square.x, square.y, square.width, square.height, 45);
   win.fill_rect(100, 100, (400 - 1), (50 - 1), RED);
 }
 
-string prepare_output_text(string input_string) {
+string prepare_output_text(string input_string)
+{
   return "  Your name: " + input_string;
 }
 
-void erase_last_char(string& input_string) {
+void erase_last_char(string& input_string)
+{
   if(input_string.size() > 0)
       input_string.erase(input_string.size() - 1);
 }
 
-void add_char(string& input_string, char c) {
-  if(input_string.size() < USER_INPUT_SIZE_MAX)
+void add_char(string& input_string, char c)
+{
+  if(input_string.size() < MAX_STRING_LENGTH)
     input_string += c;
 }
 
@@ -104,7 +111,7 @@ void process_rsdl_input(window& win, bool& quit_flag, string& input_string) {
   }
 }
 
-string run_input_capture_window(window& win, string& input_string)
+void run_input_capture_window(window& win, string& input_string)
 {
   Square square = create_square(50, 60, 1, -1, 40, 40);
   bool quit_flag = false;
@@ -118,16 +125,14 @@ string run_input_capture_window(window& win, string& input_string)
 
     //Draw Section
     win.clear();
+    draw_dynamic_background(win, square);
     draw_string(win, prepare_output_text(input_string));
-    draw_all_shapes(win, square);
     //Update the current window.
     win.update_screen();
 
     //Delay your program for specific amount time.
     Delay(TICK_DURATION);
   }
-
-  return input_string;
 }
 
 int main()
