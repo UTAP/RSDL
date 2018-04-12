@@ -7,10 +7,10 @@ else
 		CCFLAGS += -l SDL2 -l SDL2_image -l SDL2_ttf
 endif
 
-all: text_input rsdl.o head
+all: test rsdl.o head
 
-text_input: rsdl.o examples/textInput.cpp
-		g++ src/rsdl.o examples/textInput.cpp $(CCFLAGS) -o textInput.out
+test: rsdl.o examples/test.cpp
+		g++ src/rsdl.o examples/test.cpp $(CCFLAGS) -o test
 
 rsdl.o: src/rsdl.cpp
 		g++ -c src/rsdl.cpp -o src/rsdl.o
