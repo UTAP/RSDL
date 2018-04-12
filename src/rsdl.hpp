@@ -54,25 +54,26 @@ class Event{
 		SDL_Event sdlEvent;
 };
 
-class window {
+class Window {
 public:
-	window(int width=800, int height=400, std::string title="RSDL");
-	~window();
-	void draw_bmp(std::string filename, int x, int y, int width, int height);
-	void draw_png(std::string filename, int x, int y, int width, int height);
-	void draw_png(std::string filename, int x, int y, int width, int height, int angle);
+	Window(int width=800, int heigth=400, std::string title="RSDL");
+	~Window();
+	Window& operator=(const Window&);
+	void draw_bmp(std::string filename, int x, int y, int width, int heigth);
+	void draw_png(std::string filename, int x, int y, int width, int heigth);
+	void draw_png(std::string filename, int x, int y, int width, int heigth, int angle);
   void show_text(std::string input, int x=0, int y=0, RGB color=WHITE, std::string font_addr="FreeSans.ttf", int size=24);
   void draw_bg(std::string filename, int x=0, int y=0);
 	void update_screen();
-  void fill_rect(int x, int y, int width, int height, RGB color=WHITE);
+  void fill_rect(int x, int y, int width, int heigth, RGB color=WHITE);
   void draw_line(int x1, int y1, int x2, int y2, RGB color=WHITE);
   void draw_point(int x, int y, RGB color=WHITE);
-  void draw_rect(int x, int y, int width, int height, RGB color=WHITE);
+  void draw_rect(int x, int y, int width, int heigth, RGB color=WHITE);
 	void clear();
 	Event pollForEvent();
 private:
-  const int WINDOW_WIDTH;
-  const int WINDOW_HEIGHT;
+  int width;
+  int heigth;
 	SDL_Window* win;
 	SDL_Renderer* renderer;
 	std::map<std::string, SDL_Texture*> texture_cache;

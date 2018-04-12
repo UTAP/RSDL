@@ -83,7 +83,7 @@ char Event::pressedKey()
 	return sdlEvent.key.keysym.sym;
 }
 
-void window::init(){
+void Window::init(){
     if (SDL_Init(0) < 0)
 		throw "SDL Init Fail";
 	int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS);
@@ -97,9 +97,9 @@ void window::init(){
 		throw "TTF_Init Fail";
 }
 
-window::window(int width, int height, std::string title):WINDOW_WIDTH(width),WINDOW_HEIGHT(height){
+Window::Window(int width, int heigth, std::string title):width(width),heigth(heigth){
     init();
-    SDL_CreateWindowAndRenderer(width,height,0,&win,&renderer);
+    SDL_CreateWindowAndRenderer(width,heigth,0,&win,&renderer);
 	if (win == NULL || renderer == NULL)
 		throw string("Window could not be created! SDL_Error: ") + SDL_GetError();
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
@@ -107,14 +107,20 @@ window::window(int width, int height, std::string title):WINDOW_WIDTH(width),WIN
     update_screen();
 }
 
-window::~window(){
+Window::~Window(){
 	SDL_DestroyWindow(win);
     if (TTF_WasInit())
         TTF_Quit();
     SDL_Quit();
 }
 
-void window::show_text(string input, int x, int y, RGB color, string font_addr, int size){
+Window& Window::operator=(const Window& window){
+  width = window.width;
+  heigth = window.heigth;
+  return *this;
+}
+
+void Window::show_text(string input, int x, int y, RGB color, string font_addr, int size){
     SDL_Color textColor = { color.red, color.green, color.blue,};
     stringstream ss;
     ss << size;
@@ -131,16 +137,16 @@ void window::show_text(string input, int x, int y, RGB color, string font_addr, 
     SDL_DestroyTexture(text);
 }
 
-void window::set_color(RGB color){
+void Window::set_color(RGB color){
 	SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
 }
 
-void window::clear(){
+void Window::clear(){
   SDL_SetRenderDrawColor(renderer,0,0,0,0);
   SDL_RenderClear(renderer);
 }
 
-void window::draw_bmp(string filename, int x, int y, int width, int height){
+void Window::draw_bmp(string filename, int x, int y, int width, int heigth){
 	SDL_Texture* res = texture_cache[filename];
 	if (res == NULL){
 		SDL_Surface* surface = SDL_LoadBMP(filename.c_str());
@@ -148,73 +154,75 @@ void window::draw_bmp(string filename, int x, int y, int width, int height){
         SDL_FreeSurface(surface);
 		texture_cache[filename]=res;
 	}
-	SDL_Rect r = {x, y, width, height};
+	SDL_Rect r = {x, y, width, heigth};
     SDL_RenderCopy(renderer, res, NULL, &r);
 }
 
-void window::draw_png(string filename, int x, int y, int width, int height){
+void Window::draw_png(string filename, int x, int y, int width, int heigth){
 	SDL_Texture* res = texture_cache[filename];
 	if (res == NULL){
 		res = IMG_LoadTexture(renderer, filename.c_str());
 		texture_cache[filename]=res;
 	}
-    SDL_Rect r = {x, y, width, height};
+    SDL_Rect r = {x, y, width, heigth};
     SDL_RenderCopy(renderer, res, NULL, &r);
 }
 
-void window::draw_png(string filename, int x, int y, int width, int height,int angle){
+void Window::draw_png(string filename, int x, int y, int width, int heigth,int angle){
 	SDL_Texture* res = texture_cache[filename];
 	if (res == NULL){
 		res = IMG_LoadTexture(renderer, filename.c_str());
 		texture_cache[filename]=res;
 	}
-    SDL_Rect r = {x, y, width, height};
+    SDL_Rect r = {x, y, width, heigth};
     SDL_RenderCopyEx( renderer, res, NULL, &r, angle, NULL, SDL_FLIP_NONE );
 }
 
-void window::draw_bg(string filename, int x, int y){
+void Window::draw_bg(string filename, int x, int y){
 	SDL_Texture* res = texture_cache[filename];
 	if (res == NULL){
 		res = IMG_LoadTexture(renderer, filename.c_str());
 		texture_cache[filename]=res;
 	}
-    SDL_Rect src = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-    SDL_Rect dst = {x, y, WINDOW_WIDTH, WINDOW_HEIGHT};
+    SDL_Rect src = {0, 0, width, heigth};
+    SDL_Rect dst = {x, y, width, heigth};
     SDL_RenderCopy(renderer, res, &dst, &src);
 }
 
-void window::update_screen(){
+void Window::update_screen(){
 	SDL_RenderPresent(renderer);
 }
 
-void window::fill_rect(int x, int y, int width, int height, RGB color){
+void Window::fill_rect(int x, int y, int width, int heigth, RGB color){
     set_color(color);
     SDL_Rect r;
     r.x = x;
     r.y = y;
     r.w = width;
-    r.h = height;
+    r.h = heigth;
     SDL_RenderFillRect( renderer, &r );
 }
 
-void window::draw_line(int x1, int y1, int x2, int y2, RGB color){
+void Window::draw_line(int x1, int y1, int x2, int y2, RGB color){
     set_color(color);
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
-void window::draw_point(int x, int y, RGB color){
+void Window::draw_point(int x, int y, RGB color){
     set_color(color);
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void window::draw_rect(int x, int y, int width, int height, RGB color){
-    draw_line(x,y,x+width,y,color);
-    draw_line(x,y,x,y+height,color);
-    draw_line(x,y+height,x+width,y+height,color);
-    draw_line(x+width,y,x+width,y+height,color);
+void Window::draw_rect(int x, int y, int width, int heigth, RGB color){
+    for (size_t i = 0; i < 4; i++) {
+      draw_line(x+i,y+i,x+width-i,y+i,color);
+      draw_line(x+i,y+i,x+i,y+heigth-i,color);
+      draw_line(x+i,y+heigth-i,x+width-i,y+heigth-i,color);
+      draw_line(x+width-i,y+i,x+width-i,y+heigth-i,color);
+    }
 }
 
-Event window::pollForEvent(){
+Event Window::pollForEvent(){
   SDL_Event event;
   while(SDL_PollEvent(&event) != 0){
     Event e(event);
