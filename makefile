@@ -9,10 +9,19 @@ endif
 
 all: test rsdl.o head
 
-test: rsdl.o examples/test.cpp
-		g++ src/rsdl.o examples/test.cpp $(CCFLAGS) -o test
+test: textInput.o myString.o rsdl.o
+		g++ example/main.cpp src/rsdl.o example/textInput.o example/myString.o $(CCFLAGS) -o test
 
-rsdl.o: src/rsdl.cpp
+textInput.o: example/textInput.cpp myString.o rsdl.o
+	g++ -c example/textInput.cpp -o example/textInput.o
+
+myString.o: example/myString.cpp rsdl.o
+	g++ -c example/myString.cpp -o example/myString.o
+
+rsdl.o: src/rsdl.hpp src/rsdl.cpp
 		g++ -c src/rsdl.cpp -o src/rsdl.o
+
 head:
 		echo "#include "$(HEAD) > ./src/sdlHeaders.hpp
+clean:
+	rm -r *.o

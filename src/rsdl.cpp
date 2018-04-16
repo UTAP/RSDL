@@ -9,6 +9,10 @@ void Delay(int milis)
   SDL_Delay(milis);
 }
 
+Event::Event(){
+  
+}
+
 Event::Event(SDL_Event _sdlEvent)
 {
 	sdlEvent = _sdlEvent;
