@@ -4,19 +4,28 @@ language: cpp
 matrix: 
   include: 
     - 
+      env: 
+        - "MATRIX_EVAL=\"TESTENV=lint && STYLE=LLVM\""
+      os: osx
+      script: 
+        - "find . -name *.h -exec bash -c 'cmp <(clang-format --style=LLVM $0) $0' {} \\;"
+        - "find . -name *.hpp -exec bash -c 'cmp <(clang-format --style=LLVM $0) $0' {} \\;"
+        - "find . -name *.c -exec bash -c 'cmp <(clang-format --style=LLVM $0) $0' {} \\;"
+        - "find . -name *.cpp -exec bash -c 'cmp <(clang-format --style=LLVM $0) $0' {} \\;"
+    - 
       before_install: 
         - "sudo apt-get update"
         - "sudo apt-get install -y g++ make libegl1-mesa-dev libgles2-mesa-dev libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev"
       env: 
-        - "MATRIX_EVAL=\"CC=gcc && CXX=g++\""
+        - "MATRIX_EVAL=\"TESTENV=build && CC=gcc && CXX=g++\""
       os: linux
       script: 
         - make
     - 
-      env: 
-        - "MATRIX_EVAL=\"brew install gcc && CC=gcc-7 && CXX=g++-7\""
-      os: osx
       before_install: 
-        - brew install sdl2 sdl2_image sdl2_ttf
+        - "brew install sdl2 sdl2_image sdl2_ttf"
+      env: 
+        - "MATRIX_EVAL=\"TESTENV=build && brew install gcc &&  CC=gcc-7 && CXX=g++-7\""
+      os: osx
       script: 
         - make
