@@ -1,9 +1,5 @@
 UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-	CCFLAGS= -framework SDL2 -framework SDL2_image -framework SDL2_ttf
-else
-	CCFLAGS += -l SDL2 -l SDL2_image -l SDL2_ttf
-endif
+CCFLAGS += -l SDL2 -l SDL2_image -l SDL2_ttf
 
 all: test rsdl.o
 
