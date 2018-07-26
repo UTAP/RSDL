@@ -12,3 +12,12 @@ matrix:
       os: linux
       script: 
         - make
+    - 
+      env: 
+        - "MATRIX_EVAL=\"brew install gcc && CC=gcc-7 && CXX=g++-7\""
+      os: osx
+      osx_image: xcode9.4
+      before_install: 
+        - brew install sdl2 sdl2_image sdl2_ttf
+      script: 
+        - make
