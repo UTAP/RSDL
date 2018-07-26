@@ -1,9 +1,9 @@
 #include "../src/rsdl.hpp"
 #include "myString.hpp"
-#include <cstdlib>
-#include <vector>
 #include <cmath>
+#include <cstdlib>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -23,18 +23,18 @@ using namespace std;
 #define TEXT_INPUT_WIDTH 400
 #define TEXT_INPUT_HEIGHT 50
 
-class TextInputWindow
-{
-  private:
-    Window* win;
-    Event lastEvent;
-    MyString inputString;
-    bool enterPressed;
-    void draw();
-    void getAndProcessInput();
-    void processLastEvent();
-  public:
-    TextInputWindow();
-    void display();
-    string getText();
+class TextInputWindow {
+private:
+  Window *win;
+  Event lastEvent;
+  MyString inputString;
+  bool enterPressed;
+  void draw();
+  void getAndProcessInput();
+  void processLastEvent();
+
+public:
+  TextInputWindow();
+  void display();
+  string getText();
 };
