@@ -1,6 +1,4 @@
 #include "textInput.hpp"
-#include "../src/rsdl.hpp"
-#include "myString.hpp"
 
 TextInputWindow::TextInputWindow() : inputString(100, 100, 30) {
   win = new Window(WINDOW_WIDTH, WINDOW_HEIGTH, "Text Input");
