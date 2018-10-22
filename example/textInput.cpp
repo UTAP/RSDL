@@ -1,4 +1,5 @@
 #include "textInput.hpp"
+#include <cstdlib>
 
 TextInputWindow::TextInputWindow() : inputString(100, 100, 30) {
   win = new Window(WINDOW_WIDTH, WINDOW_HEIGTH, "Text Input");
@@ -30,6 +31,8 @@ void TextInputWindow::getAndProcessInput() {
 }
 
 void TextInputWindow::processLastEvent() {
+  if (lastEvent.type() == QUIT)
+    exit(0);
   if (lastEvent.type() == KEY_PRESS) {
     if (lastEvent.pressedKey() == BACK_SPACE)
       inputString.eraseLastChar();
