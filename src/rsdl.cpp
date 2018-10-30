@@ -143,48 +143,19 @@ void Window::clear() {
   SDL_RenderClear(renderer);
 }
 
-void Window::draw_bmp(string filename, int x, int y, int width, int heigth) {
-  SDL_Texture *res = texture_cache[filename];
-  if (res == NULL) {
-    SDL_Surface *surface = SDL_LoadBMP(filename.c_str());
-    res = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-    texture_cache[filename] = res;
-  }
-  SDL_Rect r = {x, y, width, heigth};
-  SDL_RenderCopy(renderer, res, NULL, &r);
-}
-
-void Window::draw_png(string filename, int x, int y, int width, int heigth) {
+void Window::draw_img(string filename, int x, int y, int width, int heigth,
+                      double angle, bool flip_horizontal, bool flip_vertical) {
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
     texture_cache[filename] = res;
   }
-  SDL_Rect r = {x, y, width, heigth};
-  SDL_RenderCopy(renderer, res, NULL, &r);
-}
-
-void Window::draw_png(string filename, int x, int y, int width, int heigth,
-                      int angle) {
-  SDL_Texture *res = texture_cache[filename];
-  if (res == NULL) {
-    res = IMG_LoadTexture(renderer, filename.c_str());
-    texture_cache[filename] = res;
-  }
-  SDL_Rect r = {x, y, width, heigth};
-  SDL_RenderCopyEx(renderer, res, NULL, &r, angle, NULL, SDL_FLIP_NONE);
-}
-
-void Window::draw_bg(string filename, int x, int y) {
-  SDL_Texture *res = texture_cache[filename];
-  if (res == NULL) {
-    res = IMG_LoadTexture(renderer, filename.c_str());
-    texture_cache[filename] = res;
-  }
-  SDL_Rect src = {0, 0, width, heigth};
-  SDL_Rect dst = {x, y, width, heigth};
-  SDL_RenderCopy(renderer, res, &dst, &src);
+  SDL_RendererFlip flip = (SDL_RendererFlip)(
+      (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
+      (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
+  SDL_Rect dst = {x, y, width ? width : this->width,
+                  heigth ? heigth : this->heigth};
+  SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
 }
 
 void Window::update_screen() { SDL_RenderPresent(renderer); }

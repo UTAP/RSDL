@@ -66,13 +66,11 @@ public:
   Window(int width = 800, int heigth = 400, std::string title = "RSDL");
   ~Window();
   Window &operator=(const Window &);
-  void draw_bmp(std::string filename, int x, int y, int width, int heigth);
-  void draw_png(std::string filename, int x, int y, int width, int heigth);
-  void draw_png(std::string filename, int x, int y, int width, int heigth,
-                int angle);
+  void draw_img(std::string filename, int x = 0, int y = 0, int width = 0,
+                int heigth = 0, double angle = 0, bool flip_horizontal = false,
+                bool flip_vertical = false);
   void show_text(std::string input, int x = 0, int y = 0, RGB color = WHITE,
                  std::string font_addr = "FreeSans.ttf", int size = 24);
-  void draw_bg(std::string filename, int x = 0, int y = 0);
   void update_screen();
   void fill_rect(int x, int y, int width, int heigth, RGB color = WHITE);
   void draw_line(int x1, int y1, int x2, int y2, RGB color = WHITE);
