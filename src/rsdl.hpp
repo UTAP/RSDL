@@ -60,12 +60,10 @@ class Event {
 public:
   Event();
   Event(SDL_Event _sdlEvent);
-  EventType type();
-  int mouseX();
-  int mouseY();
-  int relativeMouseX();
-  int relativeMouseY();
-  char pressedKey();
+  EventType get_type() const;
+  Point get_mouse_position() const;
+  Point get_relative_mouse_position() const;
+  char get_pressed_key() const;
 
 protected:
   SDL_Event sdlEvent;
@@ -89,6 +87,7 @@ public:
   void fill_rect(Point src, Point size, RGB color = WHITE);
   void clear();
   Event poll_for_event();
+  void dump_err();
 
 protected:
   Point size;
@@ -97,7 +96,6 @@ protected:
   std::map<std::string, SDL_Texture *> texture_cache;
   std::map<std::string, TTF_Font *> fonts_cache;
   void set_color(RGB color);
-  void dump_err();
   void init();
 };
 

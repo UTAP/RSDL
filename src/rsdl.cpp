@@ -10,7 +10,7 @@ Event::Event() {}
 
 Event::Event(SDL_Event _sdlEvent) { sdlEvent = _sdlEvent; }
 
-EventType Event::type() {
+EventType Event::get_type() const {
   SDL_Event e = sdlEvent;
   try {
     if (e.type == SDL_QUIT)
@@ -35,40 +35,31 @@ EventType Event::type() {
   return NA;
 }
 
-int Event::mouseX() {
-  if (type() == KEY_PRESS || type() == QUIT || type() == NA)
-    return -1;
-  if (type() == MMOTION)
-    return sdlEvent.motion.x;
-  else
-    return sdlEvent.button.x;
+Point Event::get_mouse_position() const {
+  switch (get_type()) {
+  case MMOTION:
+    return Point(sdlEvent.motion.x, sdlEvent.motion.y);
+  case LCLICK:
+  case RCLICK:
+  case LRELEASE:
+  case RRELEASE:
+    return Point(sdlEvent.button.x, sdlEvent.button.y);
+  default:
+    throw "Invalid Event Type";
+  }
 }
 
-int Event::mouseY() {
-  if (type() == KEY_PRESS || type() == QUIT || type() == NA)
-    return -1;
-  if (type() == MMOTION)
-    return sdlEvent.motion.y;
-  else
-    return sdlEvent.button.y;
+Point Event::get_relative_mouse_position() const {
+  switch (get_type()) {
+  case MMOTION:
+    return Point(sdlEvent.motion.x, sdlEvent.motion.y);
+  default:
+    return Point(0, 0);
+  }
 }
 
-int Event::relativeMouseX() {
-  if (type() != MMOTION)
-    return 0;
-  else
-    return sdlEvent.motion.xrel;
-}
-
-int Event::relativeMouseY() {
-  if (type() != MMOTION)
-    return 0;
-  else
-    return sdlEvent.motion.yrel;
-}
-
-char Event::pressedKey() {
-  if (type() != KEY_PRESS)
+char Event::get_pressed_key() const {
+  if (get_type() != KEY_PRESS)
     return -1;
   return sdlEvent.key.keysym.sym;
 }
@@ -188,7 +179,7 @@ Event Window::poll_for_event() {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) {
     Event e(event);
-    if (e.type() != 0)
+    if (e.get_type() != 0)
       return e;
   }
   return event;
@@ -196,7 +187,7 @@ Event Window::poll_for_event() {
 
 RGB::RGB(int r, int g, int b) {
   if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
-    throw "Invalid RGB color!";
+    throw "Invalid RGB Color";
   red = r;
   green = g;
   blue = b;
@@ -204,7 +195,7 @@ RGB::RGB(int r, int g, int b) {
 
 Point::Point(int _x, int _y) : x(_x), y(_y) {}
 
-void dump_err() { cerr << SDL_GetError() << endl; }
+void Window::dump_err() { cerr << SDL_GetError() << endl; }
 
 Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }
 

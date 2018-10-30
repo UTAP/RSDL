@@ -36,14 +36,14 @@ void TextInputWindow::getAndProcessInput() {
 }
 
 void TextInputWindow::processLastEvent() {
-  if (lastEvent.type() == QUIT)
+  if (lastEvent.get_type() == QUIT)
     exit(0);
-  if (lastEvent.type() == KEY_PRESS) {
-    if (lastEvent.pressedKey() == BACK_SPACE)
+  if (lastEvent.get_type() == KEY_PRESS) {
+    if (lastEvent.get_pressed_key() == BACK_SPACE)
       inputString.eraseLastChar();
-    else if (lastEvent.pressedKey() == RETURN)
+    else if (lastEvent.get_pressed_key() == RETURN)
       enterPressed = true;
     else
-      inputString.addChar(lastEvent.pressedKey());
+      inputString.addChar(lastEvent.get_pressed_key());
   }
 }
