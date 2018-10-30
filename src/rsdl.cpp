@@ -198,3 +198,13 @@ Event Window::poll_for_event() {
   }
   return event;
 }
+
+RGB::RGB(int r, int g, int b) {
+  if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
+    throw "Invalid RGB color!";
+  red = r;
+  green = g;
+  blue = b;
+}
+
+void dump_err() { cerr << SDL_GetError() << endl; }

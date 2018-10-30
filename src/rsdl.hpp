@@ -13,14 +13,7 @@
 void delay(int milis);
 
 struct RGB {
-public:
-  RGB(int r, int g, int b) {
-    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
-      throw "Invalid RGB color!";
-    red = r;
-    green = g;
-    blue = b;
-  }
+  RGB(int r, int g, int b);
   Uint8 red;
   Uint8 green;
   Uint8 blue;
@@ -87,7 +80,7 @@ protected:
   std::map<std::string, SDL_Texture *> texture_cache;
   std::map<std::string, TTF_Font *> fonts_cache;
   void set_color(RGB color);
-  void dump_err() { std::cerr << SDL_GetError() << '\n'; }
+  void dump_err();
   void init();
 };
 
