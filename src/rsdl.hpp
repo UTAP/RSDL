@@ -12,6 +12,23 @@
 
 void delay(int milis);
 
+struct Point {
+  Point(int x, int y);
+  int x;
+  int y;
+  Point operator+(const Point) const;
+  Point operator-(const Point) const;
+  Point operator*(const int)const;
+  Point operator/(const int) const;
+  Point &operator+=(const Point);
+  Point &operator-=(const Point);
+  Point &operator*=(const int);
+  Point &operator/=(const int);
+  operator SDL_Point();
+};
+Point operator*(const int, const Point);
+Point operator/(const int, const Point);
+
 struct RGB {
   RGB(int r, int g, int b);
   Uint8 red;
@@ -56,25 +73,25 @@ protected:
 
 class Window {
 public:
-  Window(int width = 800, int heigth = 400, std::string title = "RSDL");
+  Window(Point size = Point(640, 480), std::string title = "RSDL");
   ~Window();
   Window &operator=(const Window &);
-  void draw_img(std::string filename, int x = 0, int y = 0, int width = 0,
-                int heigth = 0, double angle = 0, bool flip_horizontal = false,
-                bool flip_vertical = false);
-  void show_text(std::string input, int x = 0, int y = 0, RGB color = WHITE,
+  void draw_img(std::string filename, Point src = Point(0, 0),
+                Point size = Point(0, 0), double angle = 0,
+                bool flip_horizontal = false, bool flip_vertical = false);
+  void show_text(std::string input, Point src, RGB color = WHITE,
                  std::string font_addr = "FreeSans.ttf", int size = 24);
   void update_screen();
-  void fill_rect(int x, int y, int width, int heigth, RGB color = WHITE);
-  void draw_line(int x1, int y1, int x2, int y2, RGB color = WHITE);
-  void draw_point(int x, int y, RGB color = WHITE);
-  void draw_rect(int x, int y, int width, int heigth, RGB color = WHITE);
+  void draw_line(Point src, Point dst, RGB color = WHITE);
+  void draw_point(Point, RGB color = WHITE);
+  void draw_rect(Point src, Point size, RGB color = WHITE,
+                 unsigned int line_width = 4);
+  void fill_rect(Point src, Point size, RGB color = WHITE);
   void clear();
   Event poll_for_event();
 
 protected:
-  int width;
-  int heigth;
+  Point size;
   SDL_Window *win;
   SDL_Renderer *renderer;
   std::map<std::string, SDL_Texture *> texture_cache;

@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 TextInputWindow::TextInputWindow() : inputString(100, 100, 30) {
-  win = new Window(WINDOW_WIDTH, WINDOW_HEIGTH, "Text Input");
+  win = new Window(Point(WINDOW_WIDTH, WINDOW_HEIGTH), "Text Input");
   enterPressed = false;
 }
 
@@ -18,9 +18,9 @@ string TextInputWindow::getText() { return inputString.getString(); }
 
 void TextInputWindow::draw() {
   win->clear();
-  win->draw_bg(IMG_BACKGROUND, 0, 0);
-  win->fill_rect(TEXT_INPUT_X, TEXT_INPUT_Y, TEXT_INPUT_WIDTH,
-                 TEXT_INPUT_HEIGHT, RED);
+  win->draw_img(IMG_BACKGROUND);
+  win->fill_rect(Point(TEXT_INPUT_X, TEXT_INPUT_Y),
+                 Point(TEXT_INPUT_WIDTH, TEXT_INPUT_HEIGHT), RED);
   inputString.drawString(win);
   win->update_screen();
 }

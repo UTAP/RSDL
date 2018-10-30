@@ -87,10 +87,9 @@ void Window::init() {
     throw "TTF_Init Fail";
 }
 
-Window::Window(int width, int heigth, std::string title)
-    : width(width), heigth(heigth) {
+Window::Window(Point _size, std::string title) : size(_size) {
   init();
-  SDL_CreateWindowAndRenderer(width, heigth, 0, &win, &renderer);
+  SDL_CreateWindowAndRenderer(size.x, size.y, 0, &win, &renderer);
   if (win == NULL || renderer == NULL)
     throw string("Window could not be created! SDL_Error: ") + SDL_GetError();
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
@@ -106,12 +105,11 @@ Window::~Window() {
 }
 
 Window &Window::operator=(const Window &window) {
-  width = window.width;
-  heigth = window.heigth;
+  size = window.size;
   return *this;
 }
 
-void Window::show_text(string input, int x, int y, RGB color, string font_addr,
+void Window::show_text(string input, Point src, RGB color, string font_addr,
                        int size) {
   SDL_Color textColor = {
       color.red,
@@ -129,7 +127,7 @@ void Window::show_text(string input, int x, int y, RGB color, string font_addr,
       TTF_RenderText_Solid(font, input.c_str(), textColor);
   SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, textSurface);
   SDL_FreeSurface(textSurface);
-  SDL_Rect renderQuad = {x, y, textSurface->w, textSurface->h};
+  SDL_Rect renderQuad = {src.x, src.y, textSurface->w, textSurface->h};
   SDL_RenderCopy(renderer, text, NULL, &renderQuad);
   SDL_DestroyTexture(text);
 }
@@ -143,8 +141,8 @@ void Window::clear() {
   SDL_RenderClear(renderer);
 }
 
-void Window::draw_img(string filename, int x, int y, int width, int heigth,
-                      double angle, bool flip_horizontal, bool flip_vertical) {
+void Window::draw_img(string filename, Point src, Point size, double angle,
+                      bool flip_horizontal, bool flip_vertical) {
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
@@ -153,39 +151,36 @@ void Window::draw_img(string filename, int x, int y, int width, int heigth,
   SDL_RendererFlip flip = (SDL_RendererFlip)(
       (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
-  SDL_Rect dst = {x, y, width ? width : this->width,
-                  heigth ? heigth : this->heigth};
+  SDL_Rect dst = {src.x, src.y, size.x ? size.x : this->size.x,
+                  size.y ? size.y : this->size.y};
   SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
 }
 
 void Window::update_screen() { SDL_RenderPresent(renderer); }
 
-void Window::fill_rect(int x, int y, int width, int heigth, RGB color) {
+void Window::fill_rect(Point src, Point size, RGB color) {
   set_color(color);
-  SDL_Rect r;
-  r.x = x;
-  r.y = y;
-  r.w = width;
-  r.h = heigth;
+  SDL_Rect r = {src.x, src.y, size.x, size.y};
   SDL_RenderFillRect(renderer, &r);
 }
 
-void Window::draw_line(int x1, int y1, int x2, int y2, RGB color) {
+void Window::draw_line(Point src, Point dst, RGB color) {
   set_color(color);
-  SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+  SDL_RenderDrawLine(renderer, src.x, src.y, dst.x, dst.y);
 }
 
-void Window::draw_point(int x, int y, RGB color) {
+void Window::draw_point(Point p, RGB color) {
   set_color(color);
-  SDL_RenderDrawPoint(renderer, x, y);
+  SDL_RenderDrawPoint(renderer, p.x, p.y);
 }
 
-void Window::draw_rect(int x, int y, int width, int heigth, RGB color) {
-  for (size_t i = 0; i < 4; i++) {
-    draw_line(x + i, y + i, x + width - i, y + i, color);
-    draw_line(x + i, y + i, x + i, y + heigth - i, color);
-    draw_line(x + i, y + heigth - i, x + width - i, y + heigth - i, color);
-    draw_line(x + width - i, y + i, x + width - i, y + heigth - i, color);
+void Window::draw_rect(Point src, Point size, RGB color,
+                       unsigned int line_width) {
+  for (size_t i = 0; i < line_width; i++) {
+    draw_line(src + Point(i, i), src + Point(size.x - i, i), color);
+    draw_line(src + Point(i, i), src + Point(i, size.y - i), color);
+    draw_line(src + Point(i, size.y - i), src + size - Point(i, i), color);
+    draw_line(src + Point(size.x - i, i), src + size - Point(i, i), color);
   }
 }
 
@@ -207,4 +202,45 @@ RGB::RGB(int r, int g, int b) {
   blue = b;
 }
 
+Point::Point(int _x, int _y) : x(_x), y(_y) {}
+
 void dump_err() { cerr << SDL_GetError() << endl; }
+
+Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }
+
+Point Point::operator-(const Point p) const { return Point(x - p.x, y - p.y); }
+
+Point Point::operator*(const int c) const { return Point(x * c, y * y); }
+
+Point Point::operator/(const int c) const { return Point(x / c, y / y); }
+
+Point operator*(const int c, const Point p) { return p * c; }
+
+Point operator/(const int c, const Point p) { return p / c; }
+
+Point &Point::operator+=(const Point p) {
+  (*this) = (*this) + p;
+  return (*this);
+}
+
+Point &Point::operator-=(const Point p) {
+  (*this) = (*this) - p;
+  return (*this);
+}
+
+Point &Point::operator*=(const int c) {
+  (*this) = (*this) * c;
+  return (*this);
+}
+
+Point &Point::operator/=(const int c) {
+  (*this) = (*this) / c;
+  return (*this);
+}
+
+Point::operator SDL_Point() {
+  SDL_Point ret;
+  ret.x = x;
+  ret.y = y;
+  return ret;
+}

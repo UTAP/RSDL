@@ -1,9 +1,9 @@
 UNAME_S := $(shell uname -s)
 CCFLAGS += -l SDL2 -l SDL2_image -l SDL2_ttf
 
-all: test rsdl.o
+all: test.out rsdl.o
 
-test: main.o textInput.o myString.o rsdl.o
+test.out: main.o textInput.o myString.o rsdl.o
 	g++ main.o rsdl.o textInput.o myString.o $(CCFLAGS) -o test.out
 
 main.o: src/rsdl.hpp example/textInput.hpp example/myString.hpp example/main.cpp
