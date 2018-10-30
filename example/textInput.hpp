@@ -7,34 +7,27 @@
 
 using namespace std;
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGTH 480
-#define WINDOW_TITLE "RSDL Tutorial"
-
 #define BACK_SPACE 8
 #define RETURN 13
 #define TICK_DURATION 10
-
-#define IMG_SQUARE "example/assets/square.png"
-#define IMG_BACKGROUND "example/assets/background.jpeg"
-
-#define TEXT_INPUT_X 100
-#define TEXT_INPUT_Y 100
-#define TEXT_INPUT_WIDTH 400
-#define TEXT_INPUT_HEIGHT 50
 
 class TextInputWindow {
 private:
   Window *win;
   Event lastEvent;
   MyString inputString;
+  int width;
+  int height;
+  static const int text_input_width = 400;
+  static const int text_input_height = 50;
+  const string img_background;
   bool enterPressed;
   void draw();
   void getAndProcessInput();
   void processLastEvent();
 
 public:
-  TextInputWindow();
+  TextInputWindow(int width = 640, int height = 480);
   void display();
   string getText();
 };

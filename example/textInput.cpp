@@ -1,8 +1,12 @@
 #include "textInput.hpp"
 #include <cstdlib>
 
-TextInputWindow::TextInputWindow() : inputString(100, 100, 30) {
-  win = new Window(Point(WINDOW_WIDTH, WINDOW_HEIGTH), "Text Input");
+TextInputWindow::TextInputWindow(int _width, int _height)
+    : width(_width), height(_height),
+      img_background("example/assets/background.jpg"),
+      inputString((_width - text_input_width) / 2,
+                  (_height - text_input_height) / 2, 30) {
+  win = new Window(Point(width, height), "RSDL Tutorial");
   enterPressed = false;
 }
 
@@ -18,9 +22,10 @@ string TextInputWindow::getText() { return inputString.getString(); }
 
 void TextInputWindow::draw() {
   win->clear();
-  win->draw_img(IMG_BACKGROUND);
-  win->fill_rect(Point(TEXT_INPUT_X, TEXT_INPUT_Y),
-                 Point(TEXT_INPUT_WIDTH, TEXT_INPUT_HEIGHT), RED);
+  win->draw_img(img_background);
+  win->fill_rect(
+      Point((width - text_input_width) / 2, (height - text_input_height) / 2),
+      Point(text_input_width, text_input_height), BLACK);
   inputString.drawString(win);
   win->update_screen();
 }
