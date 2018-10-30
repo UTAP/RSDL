@@ -10,7 +10,7 @@ void TextInputWindow::display() {
   while (!enterPressed) {
     getAndProcessInput();
     draw();
-    Delay(TICK_DURATION);
+    delay(TICK_DURATION);
   }
 }
 
@@ -26,7 +26,7 @@ void TextInputWindow::draw() {
 }
 
 void TextInputWindow::getAndProcessInput() {
-  lastEvent = win->pollForEvent();
+  lastEvent = win->poll_for_event();
   processLastEvent();
 }
 

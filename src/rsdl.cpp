@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void Delay(int milis) { SDL_Delay(milis); }
+void delay(int milis) { SDL_Delay(milis); }
 
 Event::Event() {}
 
@@ -218,7 +218,7 @@ void Window::draw_rect(int x, int y, int width, int heigth, RGB color) {
   }
 }
 
-Event Window::pollForEvent() {
+Event Window::poll_for_event() {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) {
     Event e(event);

@@ -9,8 +9,10 @@
 #include <iostream>
 #include <map>
 #include <string>
-void Delay(int milis);
-class RGB {
+
+void delay(int milis);
+
+struct RGB {
 public:
   RGB(int r, int g, int b) {
     if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
@@ -55,7 +57,7 @@ public:
   int relativeMouseY();
   char pressedKey();
 
-private:
+protected:
   SDL_Event sdlEvent;
 };
 
@@ -77,9 +79,9 @@ public:
   void draw_point(int x, int y, RGB color = WHITE);
   void draw_rect(int x, int y, int width, int heigth, RGB color = WHITE);
   void clear();
-  Event pollForEvent();
+  Event poll_for_event();
 
-private:
+protected:
   int width;
   int heigth;
   SDL_Window *win;
