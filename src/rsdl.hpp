@@ -10,8 +10,6 @@
 #include <map>
 #include <string>
 
-void delay(int milis);
-
 struct Point {
   Point(int x, int y);
   int x;
@@ -27,7 +25,7 @@ struct Point {
   operator SDL_Point();
 };
 Point operator*(const int, const Point);
-Point operator/(const int, const Point);
+std::ostream& operator<<(std::ostream& stream, const Point);
 
 struct RGB {
   RGB(int r, int g, int b);
@@ -98,5 +96,8 @@ protected:
   void set_color(RGB color);
   void init();
 };
+
+void delay(int milis);
+Point get_current_mouse_position();
 
 #endif

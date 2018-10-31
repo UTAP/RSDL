@@ -49,6 +49,12 @@ Point Event::get_mouse_position() const {
   }
 }
 
+Point get_current_mouse_position() {
+  Point ret(0, 0);
+  SDL_GetMouseState(&ret.x, &ret.y);
+  return ret;
+}
+
 Point Event::get_relative_mouse_position() const {
   switch (get_type()) {
   case MMOTION:
@@ -201,13 +207,11 @@ Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }
 
 Point Point::operator-(const Point p) const { return Point(x - p.x, y - p.y); }
 
-Point Point::operator*(const int c) const { return Point(x * c, y * y); }
+Point Point::operator*(const int c) const { return Point(x * c, y * c); }
 
-Point Point::operator/(const int c) const { return Point(x / c, y / y); }
+Point Point::operator/(const int c) const { return Point(x / c, y / c); }
 
 Point operator*(const int c, const Point p) { return p * c; }
-
-Point operator/(const int c, const Point p) { return p / c; }
 
 Point &Point::operator+=(const Point p) {
   (*this) = (*this) + p;
@@ -234,4 +238,9 @@ Point::operator SDL_Point() {
   ret.x = x;
   ret.y = y;
   return ret;
+}
+
+ostream &operator<<(ostream &stream, const Point p) {
+  stream << '(' << p.x << ", " << p.y << ')';
+  return stream;
 }
