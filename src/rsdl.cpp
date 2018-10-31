@@ -123,10 +123,10 @@ void Window::show_text(string input, Point src, RGB color, string font_addr,
   SDL_Surface *textSurface =
       TTF_RenderText_Solid(font, input.c_str(), textColor);
   SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, textSurface);
-  SDL_FreeSurface(textSurface);
   SDL_Rect renderQuad = {src.x, src.y, textSurface->w, textSurface->h};
   SDL_RenderCopy(renderer, text, NULL, &renderQuad);
   SDL_DestroyTexture(text);
+  SDL_FreeSurface(textSurface);
 }
 
 void Window::set_color(RGB color) {
