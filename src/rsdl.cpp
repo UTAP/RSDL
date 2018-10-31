@@ -205,7 +205,7 @@ void Window::dump_err() { cerr << SDL_GetError() << endl; }
 
 Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }
 
-Point Point::operator-(const Point p) const { return Point(x - p.x, y - p.y); }
+Point Point::operator-(const Point p) const { return (*this) + (-1) * p; }
 
 Point Point::operator*(const int c) const { return Point(x * c, y * c); }
 
