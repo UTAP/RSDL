@@ -3,7 +3,7 @@
 
 TextInputWindow::TextInputWindow(int _width, int _height)
     : width(_width), height(_height),
-      img_background("example/assets/background.jpg"),
+      img_background("example/assets/ut.png"),
       inputString((_width - text_input_width) / 2,
                   (_height - text_input_height) / 2, 30) {
   win = new Window(Point(width, height), "RSDL Tutorial");
