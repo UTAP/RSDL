@@ -7,4 +7,6 @@ a SDL2 wrapper
 
 See [Wiki](../../wiki) for [Documentation](../../wiki/Documentation) and [Installation Guide](../../wiki/Installation).
 
+There are two examples available in _example_ folder: single-file simpler _example.cpp_ and a multi-file more complex example (other files).
+
 Some assets for example have been taken from [0 A.D.](https://play0ad.com/).
