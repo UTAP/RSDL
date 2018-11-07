@@ -50,11 +50,16 @@ void render(Window &win, const vector<Person> &persons) {
 int main(int argc, char const *argv[]) {
   srand(time(NULL));
 
-  Window win = Window();
-  vector<Person> persons;
+  try {
+    Window win = Window();
+    vector<Person> persons;
 
-  while (process_event(win.poll_for_event(), persons)) {
-    render(win, persons);
+    while (process_event(win.poll_for_event(), persons)) {
+      render(win, persons);
+    }
+  } catch (string exception) {
+    cerr << "EXCEPTION: " << exception << endl;
+    exit(1);
   }
 
   return 0;
