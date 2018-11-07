@@ -183,6 +183,23 @@ void Window::draw_rect(Point src, Point size, RGB color,
   }
 }
 
+void Window::fill_circle(Point center, int r, RGB color) {
+  float tx, ty;
+  float xr;
+  set_color(color);
+  for (ty = (float)-SDL_fabs(r); ty <= (float)SDL_fabs((int)r); ty++) {
+    xr = (float)SDL_sqrt(r * r - ty * ty);
+    if (r > 0) { /* r > 0 ==> filled circle */
+      for (tx = -xr + .5f; tx <= xr - .5; tx++) {
+        draw_point(center + Point(tx, ty), color);
+      }
+    } else {
+      draw_point(center + Point(- xr + .5f, ty), color);
+      draw_point(center + Point(+ xr - .5f, ty), color);
+    }
+  }
+}
+
 Event Window::poll_for_event() {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) {

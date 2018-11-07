@@ -25,7 +25,7 @@ struct Point {
   operator SDL_Point();
 };
 Point operator*(const int, const Point);
-std::ostream& operator<<(std::ostream& stream, const Point);
+std::ostream &operator<<(std::ostream &stream, const Point);
 
 struct RGB {
   RGB(int r, int g, int b);
@@ -83,6 +83,7 @@ public:
   void draw_rect(Point src, Point size, RGB color = WHITE,
                  unsigned int line_width = 4);
   void fill_rect(Point src, Point size, RGB color = WHITE);
+  void fill_circle(Point center, int radius, RGB color = WHITE);
   void clear();
   Event poll_for_event();
   void dump_err();

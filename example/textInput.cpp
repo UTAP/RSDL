@@ -2,8 +2,7 @@
 #include <cstdlib>
 
 TextInputWindow::TextInputWindow(int _width, int _height)
-    : width(_width), height(_height),
-      img_background("example/assets/ut.png"),
+    : width(_width), height(_height), img_background("example/assets/ut.png"),
       inputString((_width - text_input_width) / 2,
                   (_height - text_input_height) / 2, 30) {
   win = new Window(Point(width, height), "RSDL Tutorial");
@@ -23,9 +22,14 @@ string TextInputWindow::getText() { return inputString.getString(); }
 void TextInputWindow::draw() {
   win->clear();
   win->draw_img(img_background);
+  RGB input_back_color(30, 30, 30);
+  win->fill_circle(Point((width - text_input_width) / 2, height / 2),
+                   text_input_height / 2, input_back_color);
+  win->fill_circle(Point((width + text_input_width) / 2, height / 2),
+                   text_input_height / 2, input_back_color);
   win->fill_rect(
       Point((width - text_input_width) / 2, (height - text_input_height) / 2),
-      Point(text_input_width, text_input_height), BLACK);
+      Point(text_input_width, text_input_height), input_back_color);
   inputString.drawString(win);
   win->update_screen();
 }
