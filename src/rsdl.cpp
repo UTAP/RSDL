@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void delay(int milis) { SDL_Delay(milis); }
+void delay(int millisecond) { SDL_Delay(millisecond); }
 
 Event::Event() {}
 

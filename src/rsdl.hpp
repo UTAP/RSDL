@@ -77,13 +77,13 @@ public:
                 bool flip_horizontal = false, bool flip_vertical = false);
   void show_text(std::string input, Point src, RGB color = WHITE,
                  std::string font_addr = "FreeSans.ttf", int size = 24);
-  void update_screen();
-  void draw_line(Point src, Point dst, RGB color = WHITE);
   void draw_point(Point, RGB color = WHITE);
+  void draw_line(Point src, Point dst, RGB color = WHITE);
   void draw_rect(Point src, Point size, RGB color = WHITE,
                  unsigned int line_width = 4);
   void fill_rect(Point src, Point size, RGB color = WHITE);
   void fill_circle(Point center, int radius, RGB color = WHITE);
+  void update_screen();
   void clear();
   Event poll_for_event();
   void dump_err();
@@ -98,7 +98,7 @@ protected:
   void init();
 };
 
-void delay(int milis);
+void delay(int millisecond);
 Point get_current_mouse_position();
 
 #endif
