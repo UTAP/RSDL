@@ -43,21 +43,20 @@ const RGB GREEN(0, 255, 0);
 const RGB BLUE(0, 0, 255);
 const RGB BLACK(0, 0, 0);
 
-enum EventType {
-  NA,
-  LCLICK,
-  RCLICK,
-  LRELEASE,
-  RRELEASE,
-  MMOTION,
-  KEY_PRESS,
-  QUIT
-};
-
 class Event {
 public:
   Event();
   Event(SDL_Event _sdlEvent);
+  enum EventType {
+    NA,
+    LCLICK,
+    RCLICK,
+    LRELEASE,
+    RRELEASE,
+    MMOTION,
+    KEY_PRESS,
+    QUIT
+  };
   EventType get_type() const;
   Point get_mouse_position() const;
   Point get_relative_mouse_position() const;

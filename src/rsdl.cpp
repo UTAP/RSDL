@@ -10,7 +10,7 @@ Event::Event() {}
 
 Event::Event(SDL_Event _sdlEvent) { sdlEvent = _sdlEvent; }
 
-EventType Event::get_type() const {
+Event::EventType Event::get_type() const {
   SDL_Event e = sdlEvent;
   try {
     if (e.type == SDL_QUIT)
@@ -194,8 +194,8 @@ void Window::fill_circle(Point center, int r, RGB color) {
         draw_point(center + Point(tx, ty), color);
       }
     } else {
-      draw_point(center + Point(- xr + .5f, ty), color);
-      draw_point(center + Point(+ xr - .5f, ty), color);
+      draw_point(center + Point(-xr + .5f, ty), color);
+      draw_point(center + Point(+xr - .5f, ty), color);
     }
   }
 }

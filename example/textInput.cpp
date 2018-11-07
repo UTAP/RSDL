@@ -40,9 +40,9 @@ void TextInputWindow::getAndProcessInput() {
 }
 
 void TextInputWindow::processLastEvent() {
-  if (lastEvent.get_type() == QUIT)
+  if (lastEvent.get_type() == Event::QUIT)
     exit(0);
-  if (lastEvent.get_type() == KEY_PRESS) {
+  if (lastEvent.get_type() == Event::KEY_PRESS) {
     if (lastEvent.get_pressed_key() == BACK_SPACE)
       inputString.eraseLastChar();
     else if (lastEvent.get_pressed_key() == RETURN)

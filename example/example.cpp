@@ -20,13 +20,13 @@ struct Person {
 bool process_event(const Event &event, vector<Person> &persons) {
   static const string persons_names[] = {"Ghune", "Spartiate", "Athenian"};
   switch (event.get_type()) {
-  case QUIT:
+  case Event::QUIT:
     return false;
-  case LCLICK:
+  case Event::LCLICK:
     persons.push_back(Person(persons_names[rand() % 3], rand() % 2,
                              event.get_mouse_position()));
     break;
-  case KEY_PRESS:
+  case Event::KEY_PRESS:
     if (event.get_pressed_key() == 'q')
       return false;
   default:;
