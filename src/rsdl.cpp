@@ -46,7 +46,7 @@ Point Event::get_mouse_position() const {
   case RRELEASE:
     return Point(sdlEvent.button.x, sdlEvent.button.y);
   default:
-    throw "Invalid Event Type";
+    throw runtime_error("Invalid Event Type");
   }
 }
 
@@ -73,23 +73,23 @@ char Event::get_pressed_key() const {
 
 void Window::init() {
   if (SDL_Init(0) < 0)
-    throw "SDL Init Fail";
+    throw runtime_error("SDL Init Fail");
   int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   if (SDL_WasInit(flags) != 0)
-    throw string("SDL_WasInit Failed ") + SDL_GetError();
+    throw runtime_error(string("SDL_WasInit Failed ") + SDL_GetError());
   if (SDL_InitSubSystem(flags) < 0)
-    throw string("SDL_InitSubSystem Failed ") + SDL_GetError();
+    throw runtime_error(string("SDL_InitSubSystem Failed ") + SDL_GetError());
   if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
-    throw "IMG_Init Fail";
+    throw runtime_error("IMG_Init Fail");
   if (TTF_Init() == -1)
-    throw "TTF_Init Fail";
+    throw runtime_error("TTF_Init Fail");
 }
 
 Window::Window(Point _size, std::string title) : size(_size) {
   init();
   SDL_CreateWindowAndRenderer(size.x, size.y, 0, &win, &renderer);
   if (win == NULL || renderer == NULL)
-    throw string("Window could not be created! SDL_Error: ") + SDL_GetError();
+    throw runtime_error(string("Window could not be created! SDL_Error: ") + SDL_GetError());
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
   SDL_SetWindowTitle(win, title.c_str());
 
@@ -122,7 +122,7 @@ void Window::show_text(string input, Point src, RGB color, string font_addr,
     font = TTF_OpenFont(font_addr.c_str(), size);
     fonts_cache[font_addr + ":" + ss.str()] = font;
     if (font == NULL)
-      throw "Font Not Found: " + font_addr;
+      throw runtime_error("Font Not Found: " + font_addr);
   }
   SDL_Surface *textSurface =
       TTF_RenderText_Solid(font, input.c_str(), textColor);
@@ -215,7 +215,7 @@ Event Window::poll_for_event() {
 
 RGB::RGB(int r, int g, int b) {
   if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
-    throw "Invalid RGB Color";
+    throw logical_error("Invalid RGB Color");
   red = r;
   green = g;
   blue = b;
