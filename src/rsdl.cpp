@@ -1,6 +1,7 @@
 #include "rsdl.hpp"
 #include <iostream>
 #include <sstream>
+#include <exception>
 
 using namespace std;
 
@@ -91,6 +92,7 @@ Window::Window(Point _size, std::string title) : size(_size) {
     throw string("Window could not be created! SDL_Error: ") + SDL_GetError();
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
   SDL_SetWindowTitle(win, title.c_str());
+
   update_screen();
 }
 
@@ -145,6 +147,7 @@ void Window::draw_img(string filename, Point src, Point size, double angle,
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
+    if (res == NULL) throw runtime_error("Failed to load image: " + filename);
     texture_cache[filename] = res;
   }
   SDL_RendererFlip flip = (SDL_RendererFlip)(
