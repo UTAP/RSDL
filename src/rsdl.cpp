@@ -147,7 +147,8 @@ void Window::draw_img(string filename, Point src, Point size, double angle,
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
-    if (res == NULL) throw runtime_error("Failed to load image: " + filename);
+    if (res == NULL) throw runtime_error("Failed to load image: \"" + filename + "\". " +
+      "make sure you are using the correct address.");
     texture_cache[filename] = res;
   }
   SDL_RendererFlip flip = (SDL_RendererFlip)(
