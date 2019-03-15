@@ -9,10 +9,10 @@ void delay(int millisecond) { SDL_Delay(millisecond); }
 
 Event::Event() {}
 
-Event::Event(SDL_Event _sdlEvent) { sdlEvent = _sdlEvent; }
+Event::Event(SDL_Event _sdl_event) { sdl_event = _sdl_event; }
 
 Event::EventType Event::get_type() const {
-  SDL_Event e = sdlEvent;
+  SDL_Event e = sdl_event;
   try {
     if (e.type == SDL_QUIT)
       return QUIT;
@@ -39,12 +39,12 @@ Event::EventType Event::get_type() const {
 Point Event::get_mouse_position() const {
   switch (get_type()) {
   case MMOTION:
-    return Point(sdlEvent.motion.x, sdlEvent.motion.y);
+    return Point(sdl_event.motion.x, sdl_event.motion.y);
   case LCLICK:
   case RCLICK:
   case LRELEASE:
   case RRELEASE:
-    return Point(sdlEvent.button.x, sdlEvent.button.y);
+    return Point(sdl_event.button.x, sdl_event.button.y);
   default:
     throw runtime_error("Invalid Event Type");
   }
@@ -59,7 +59,7 @@ Point get_current_mouse_position() {
 Point Event::get_relative_mouse_position() const {
   switch (get_type()) {
   case MMOTION:
-    return Point(sdlEvent.motion.x, sdlEvent.motion.y);
+    return Point(sdl_event.motion.x, sdl_event.motion.y);
   default:
     return Point(0, 0);
   }
@@ -68,7 +68,7 @@ Point Event::get_relative_mouse_position() const {
 char Event::get_pressed_key() const {
   if (get_type() != KEY_PRESS)
     return -1;
-  return sdlEvent.key.keysym.sym;
+  return sdl_event.key.keysym.sym;
 }
 
 void Window::init() {

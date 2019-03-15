@@ -46,7 +46,7 @@ const RGB BLACK(0, 0, 0);
 class Event {
 public:
   Event();
-  Event(SDL_Event _sdlEvent);
+  Event(SDL_Event _sdl_event);
   enum EventType {
     NA,
     LCLICK,
@@ -63,7 +63,7 @@ public:
   char get_pressed_key() const;
 
 protected:
-  SDL_Event sdlEvent;
+  SDL_Event sdl_event;
 };
 
 class Window {
