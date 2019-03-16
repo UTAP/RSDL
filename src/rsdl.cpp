@@ -143,7 +143,7 @@ void Window::clear() {
   SDL_RenderClear(renderer);
 }
 
-void Window::draw_img(string filename, Point src, Point size, double angle,
+void Window::draw_img(string filename, Rectangle dest, double angle,
                       bool flip_horizontal, bool flip_vertical) {
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
@@ -155,16 +155,16 @@ void Window::draw_img(string filename, Point src, Point size, double angle,
   SDL_RendererFlip flip = (SDL_RendererFlip)(
       (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
-  SDL_Rect dst = {src.x, src.y, size.x ? size.x : this->width,
-                  size.y ? size.y : this->height};
+  SDL_Rect dst = {dest.x, dest.y, dest.w ? dest.w : this->width,
+                  dest.h ? dest.h : this->height};
   SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
 }
 
 void Window::update_screen() { SDL_RenderPresent(renderer); }
 
-void Window::fill_rect(Point src, Point size, RGB color) {
+void Window::fill_rect(Rectangle rect, RGB color) {
   set_color(color);
-  SDL_Rect r = {src.x, src.y, size.x, size.y};
+  SDL_Rect r = {rect.x, rect.y, rect.w, rect.h};
   SDL_RenderFillRect(renderer, &r);
 }
 
@@ -178,13 +178,14 @@ void Window::draw_point(Point p, RGB color) {
   SDL_RenderDrawPoint(renderer, p.x, p.y);
 }
 
-void Window::draw_rect(Point src, Point size, RGB color,
-                       unsigned int line_width) {
+void Window::draw_rect(Rectangle rect, RGB color, unsigned int line_width) {
+  Point top_left = Point(rect.x, rect.y);
+  Point bottom_right = Point(rect.x + rect.w, rect.y + rect.h);
   for (size_t i = 0; i < line_width; i++) {
-    draw_line(src + Point(i, i), src + Point(size.x - i, i), color);
-    draw_line(src + Point(i, i), src + Point(i, size.y - i), color);
-    draw_line(src + Point(i, size.y - i), src + size - Point(i, i), color);
-    draw_line(src + Point(size.x - i, i), src + size - Point(i, i), color);
+    draw_line(top_left + Point(i, i), top_left + Point(rect.w - i, i), color);
+    draw_line(top_left + Point(i, i), top_left + Point(i, rect.h - i), color);
+    draw_line(top_left + Point(i, rect.h - i), bottom_right - Point(i, i), color);
+    draw_line(top_left + Point(rect.w - i, i), bottom_right - Point(i, i), color);
   }
 }
 
