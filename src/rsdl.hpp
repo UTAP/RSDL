@@ -28,6 +28,13 @@ Point operator*(const int, const Point);
 std::ostream &operator<<(std::ostream &stream, const Point);
 
 
+struct Rectangle {
+    Rectangle(int x, int y, int w, int h);
+    Rectangle(Point top_left, Point bottom_right);
+    int x, y, w, h;
+};
+
+
 struct RGB {
   RGB(int r, int g, int b);
   Uint8 red;

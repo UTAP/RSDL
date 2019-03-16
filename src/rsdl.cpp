@@ -268,3 +268,18 @@ ostream &operator<<(ostream &stream, const Point p) {
   stream << '(' << p.x << ", " << p.y << ')';
   return stream;
 }
+
+
+Rectangle::Rectangle(int _x, int _y, int _w, int _h) {
+  x = _x;
+  y = _y;
+  w = _w;
+  h = _h;
+}
+
+Rectangle::Rectangle(Point top_left, Point bottom_right) {
+  x = top_left.x;
+  y = top_left.y;
+  w = bottom_right.x - top_left.x;
+  h = bottom_right.y - top_left.y;
+}
