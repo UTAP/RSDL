@@ -206,11 +206,15 @@ void Window::fill_circle(Point center, int r, RGB color) {
   }
 }
 
+bool Window::has_pending_event() {
+  return SDL_PollEvent(NULL);
+}
+
 Event Window::poll_for_event() {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) {
     Event e(event);
-    if (e.get_type() != 0)
+    if (e.get_type() != Event::NA)
       return e;
   }
   return event;

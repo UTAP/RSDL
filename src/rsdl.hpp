@@ -63,7 +63,8 @@ public:
     RRELEASE,
     MMOTION,
     KEY_PRESS,
-    QUIT
+    QUIT,
+    NO_EVENT
   };
   EventType get_type() const;
   Point get_mouse_position() const;
@@ -91,6 +92,7 @@ public:
   void fill_circle(Point center, int radius, RGB color = WHITE);
   void update_screen();
   void clear();
+  bool has_pending_event();
   Event poll_for_event();
   void dump_err();
 
