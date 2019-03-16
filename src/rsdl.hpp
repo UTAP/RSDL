@@ -27,6 +27,7 @@ struct Point {
 Point operator*(const int, const Point);
 std::ostream &operator<<(std::ostream &stream, const Point);
 
+
 struct RGB {
   RGB(int r, int g, int b);
   Uint8 red;
@@ -68,11 +69,11 @@ protected:
 
 class Window {
 public:
-  Window(Point size = Point(640, 480), std::string title = "RSDL");
+  Window(int width = 640, int height = 480, std::string title = "RSDL");
   ~Window();
   Window &operator=(const Window &);
   void draw_img(std::string filename, Point src = Point(0, 0),
-                Point size = Point(0, 0), double angle = 0,
+                Point size = Point(0,0), double angle = 0,
                 bool flip_horizontal = false, bool flip_vertical = false);
   void show_text(std::string input, Point src, RGB color = WHITE,
                  std::string font_addr = "FreeSans.ttf", int size = 24);
@@ -88,7 +89,7 @@ public:
   void dump_err();
 
 protected:
-  Point size;
+  int width, height;
   SDL_Window *win;
   SDL_Renderer *renderer;
   std::map<std::string, SDL_Texture *> texture_cache;

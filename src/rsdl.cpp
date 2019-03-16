@@ -85,9 +85,9 @@ void Window::init() {
     throw runtime_error("TTF_Init Fail");
 }
 
-Window::Window(Point _size, std::string title) : size(_size) {
+Window::Window(int _width, int _height, std::string title) : width(_width), height(_height) {
   init();
-  SDL_CreateWindowAndRenderer(size.x, size.y, 0, &win, &renderer);
+  SDL_CreateWindowAndRenderer(width, height, 0, &win, &renderer);
   if (win == NULL || renderer == NULL)
     throw runtime_error(string("Window could not be created! SDL_Error: ") + SDL_GetError());
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
@@ -104,7 +104,8 @@ Window::~Window() {
 }
 
 Window &Window::operator=(const Window &window) {
-  size = window.size;
+  width = window.width;
+  height = window.height;
   return *this;
 }
 
@@ -154,8 +155,8 @@ void Window::draw_img(string filename, Point src, Point size, double angle,
   SDL_RendererFlip flip = (SDL_RendererFlip)(
       (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
-  SDL_Rect dst = {src.x, src.y, size.x ? size.x : this->size.x,
-                  size.y ? size.y : this->size.y};
+  SDL_Rect dst = {src.x, src.y, size.x ? size.x : this->width,
+                  size.y ? size.y : this->height};
   SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
 }
 
