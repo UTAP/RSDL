@@ -1,7 +1,7 @@
 #include "rsdl.hpp"
+#include <exception>
 #include <iostream>
 #include <sstream>
-#include <exception>
 
 using namespace std;
 
@@ -85,11 +85,13 @@ void Window::init() {
     throw runtime_error("TTF_Init Fail");
 }
 
-Window::Window(int _width, int _height, std::string title) : width(_width), height(_height) {
+Window::Window(int _width, int _height, std::string title)
+    : width(_width), height(_height) {
   init();
   SDL_CreateWindowAndRenderer(width, height, 0, &win, &renderer);
   if (win == NULL || renderer == NULL)
-    throw runtime_error(string("Window could not be created! SDL_Error: ") + SDL_GetError());
+    throw runtime_error(string("Window could not be created! SDL_Error: ") +
+                        SDL_GetError());
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
   SDL_SetWindowTitle(win, title.c_str());
 
@@ -148,8 +150,9 @@ void Window::draw_img(string filename, Rectangle dest, double angle,
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
-    if (res == NULL) throw runtime_error("Failed to load image: \"" + filename + "\". " +
-      "make sure you are using the correct address.");
+    if (res == NULL)
+      throw runtime_error("Failed to load image: \"" + filename + "\". " +
+                          "make sure you are using the correct address.");
     texture_cache[filename] = res;
   }
   SDL_RendererFlip flip = (SDL_RendererFlip)(
@@ -184,8 +187,10 @@ void Window::draw_rect(Rectangle rect, RGB color, unsigned int line_width) {
   for (size_t i = 0; i < line_width; i++) {
     draw_line(top_left + Point(i, i), top_left + Point(rect.w - i, i), color);
     draw_line(top_left + Point(i, i), top_left + Point(i, rect.h - i), color);
-    draw_line(top_left + Point(i, rect.h - i), bottom_right - Point(i, i), color);
-    draw_line(top_left + Point(rect.w - i, i), bottom_right - Point(i, i), color);
+    draw_line(top_left + Point(i, rect.h - i), bottom_right - Point(i, i),
+              color);
+    draw_line(top_left + Point(rect.w - i, i), bottom_right - Point(i, i),
+              color);
   }
 }
 
@@ -206,9 +211,7 @@ void Window::fill_circle(Point center, int r, RGB color) {
   }
 }
 
-bool Window::has_pending_event() {
-  return SDL_PollEvent(NULL);
-}
+bool Window::has_pending_event() { return SDL_PollEvent(NULL); }
 
 Event Window::poll_for_event() {
   SDL_Event event;
@@ -273,7 +276,6 @@ ostream &operator<<(ostream &stream, const Point p) {
   stream << '(' << p.x << ", " << p.y << ')';
   return stream;
 }
-
 
 Rectangle::Rectangle(int _x, int _y, int _w, int _h) {
   x = _x;
