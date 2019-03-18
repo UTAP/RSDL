@@ -39,8 +39,9 @@ void render(Window &win, const vector<Person> &persons) {
   win.draw_img("example/assets/back.png");
   for (vector<Person>::const_iterator person = persons.begin();
        person != persons.end(); person++)
-    win.draw_img("example/assets/" + person->name + ".png", 
-               Rectangle(person->pos, person->pos + person->size) , 0, person->flipped);
+    win.draw_img("example/assets/" + person->name + ".png",
+                 Rectangle(person->pos, person->pos + person->size), 0,
+                 person->flipped);
   win.draw_img("example/assets/cursor.png",
                Rectangle(get_current_mouse_position() - Point(15, 15), 30, 30));
   win.update_screen();

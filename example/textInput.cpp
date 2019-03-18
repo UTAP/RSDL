@@ -27,9 +27,10 @@ void TextInputWindow::draw() {
                    text_input_height / 2, input_back_color);
   win->fill_circle(Point((width + text_input_width) / 2, height / 2),
                    text_input_height / 2, input_back_color);
-  win->fill_rect(
-      Rectangle((width - text_input_width) / 2, (height - text_input_height) / 2,
-                text_input_width, text_input_height), input_back_color);
+  win->fill_rect(Rectangle((width - text_input_width) / 2,
+                           (height - text_input_height) / 2, text_input_width,
+                           text_input_height),
+                 input_back_color);
   inputString.drawString(win);
   win->update_screen();
 }

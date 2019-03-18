@@ -34,8 +34,8 @@ struct Rectangle {
 
   int x, y, w, h;
 
-  private: 
-    void init(int x, int y, int w, int h);
+private:
+  void init(int x, int y, int w, int h);
 };
 std::ostream &operator<<(std::ostream &stream, const Rectangle);
 
