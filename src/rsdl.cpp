@@ -158,15 +158,11 @@ void Window::draw_img(string filename, Rectangle dest, double angle,
   SDL_RendererFlip flip = (SDL_RendererFlip)(
       (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
-  SDL_Rect dst = {dest.x, dest.y, dest.w ? dest.w : this->width,
-                  dest.h ? dest.h : this->height};
-  SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
-}
 
-void Window::draw_img(string filename, double angle, bool flip_horizontal,
-                      bool flip_vertical) {
-  draw_img(filename, Rectangle(0, 0, this->width, this->height), angle,
-           flip_horizontal, flip_vertical);
+  SDL_Rect sdl_dest = {dest.x, dest.y, dest.w, dest.h};
+  SDL_Rect* dest_ptr = (dest == NULL_RECT ? NULL : &sdl_dest);
+
+  SDL_RenderCopyEx(renderer, res, NULL, dest_ptr, angle, NULL, flip);
 }
 
 void Window::update_screen() { SDL_RenderPresent(renderer); }
@@ -299,6 +295,12 @@ void Rectangle::init(int _x, int _y, int _w, int _h) {
   y = _y;
   w = _w;
   h = _h;
+}
+
+Rectangle NULL_RECT(-1,-1,-1,-1);
+
+bool Rectangle::operator==(const Rectangle& r) {
+  return x == r.x && y == r.y && w == r.w && h == r.h;
 }
 
 std::ostream &operator<<(std::ostream &stream, const Rectangle r) {

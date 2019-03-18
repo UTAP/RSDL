@@ -32,6 +32,7 @@ struct Rectangle {
   Rectangle(int x, int y, int w, int h);
   Rectangle(Point top_left, Point bottom_right);
   Rectangle(Point top_left, int w, int h);
+  bool operator==(const Rectangle&);
 
   int x, y, w, h;
 
@@ -39,6 +40,8 @@ private:
   void init(int x, int y, int w, int h);
 };
 std::ostream &operator<<(std::ostream &stream, const Rectangle);
+
+extern Rectangle NULL_RECT;
 
 struct RGB {
   RGB(int r, int g, int b);
@@ -85,9 +88,7 @@ public:
   Window(int width = 640, int height = 480, std::string title = "RSDL");
   ~Window();
   Window &operator=(const Window &);
-  void draw_img(std::string filename, Rectangle dest, double angle = 0,
-                bool flip_horizontal = false, bool flip_vertical = false);
-  void draw_img(std::string filename, double angle = 0,
+  void draw_img(std::string filename, Rectangle dest = NULL_RECT, double angle = 0,
                 bool flip_horizontal = false, bool flip_vertical = false);
   void show_text(std::string input, Point src, RGB color = WHITE,
                  std::string font_addr = "FreeSans.ttf", int size = 24);
