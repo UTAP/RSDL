@@ -33,7 +33,11 @@ struct Rectangle {
   Rectangle(Point top_left, int w, int h);
 
   int x, y, w, h;
+
+  private: 
+    void init(int x, int y, int w, int h);
 };
+std::ostream &operator<<(std::ostream &stream, const Rectangle);
 
 struct RGB {
   RGB(int r, int g, int b);
