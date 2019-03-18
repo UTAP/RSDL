@@ -1,4 +1,5 @@
 #include "rsdl.hpp"
+#include <exception>
 #include <iostream>
 #include <sstream>
 
@@ -8,10 +9,10 @@ void delay(int millisecond) { SDL_Delay(millisecond); }
 
 Event::Event() {}
 
-Event::Event(SDL_Event _sdlEvent) { sdlEvent = _sdlEvent; }
+Event::Event(SDL_Event _sdl_event) { sdl_event = _sdl_event; }
 
 Event::EventType Event::get_type() const {
-  SDL_Event e = sdlEvent;
+  SDL_Event e = sdl_event;
   try {
     if (e.type == SDL_QUIT)
       return QUIT;
@@ -38,14 +39,14 @@ Event::EventType Event::get_type() const {
 Point Event::get_mouse_position() const {
   switch (get_type()) {
   case MMOTION:
-    return Point(sdlEvent.motion.x, sdlEvent.motion.y);
+    return Point(sdl_event.motion.x, sdl_event.motion.y);
   case LCLICK:
   case RCLICK:
   case LRELEASE:
   case RRELEASE:
-    return Point(sdlEvent.button.x, sdlEvent.button.y);
+    return Point(sdl_event.button.x, sdl_event.button.y);
   default:
-    throw "Invalid Event Type";
+    throw runtime_error("Invalid Event Type");
   }
 }
 
@@ -58,7 +59,7 @@ Point get_current_mouse_position() {
 Point Event::get_relative_mouse_position() const {
   switch (get_type()) {
   case MMOTION:
-    return Point(sdlEvent.motion.x, sdlEvent.motion.y);
+    return Point(sdl_event.motion.x, sdl_event.motion.y);
   default:
     return Point(0, 0);
   }
@@ -67,30 +68,33 @@ Point Event::get_relative_mouse_position() const {
 char Event::get_pressed_key() const {
   if (get_type() != KEY_PRESS)
     return -1;
-  return sdlEvent.key.keysym.sym;
+  return sdl_event.key.keysym.sym;
 }
 
 void Window::init() {
   if (SDL_Init(0) < 0)
-    throw "SDL Init Fail";
+    throw runtime_error("SDL Init Fail");
   int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   if (SDL_WasInit(flags) != 0)
-    throw string("SDL_WasInit Failed ") + SDL_GetError();
+    throw runtime_error(string("SDL_WasInit Failed ") + SDL_GetError());
   if (SDL_InitSubSystem(flags) < 0)
-    throw string("SDL_InitSubSystem Failed ") + SDL_GetError();
+    throw runtime_error(string("SDL_InitSubSystem Failed ") + SDL_GetError());
   if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
-    throw "IMG_Init Fail";
+    throw runtime_error("IMG_Init Fail");
   if (TTF_Init() == -1)
-    throw "TTF_Init Fail";
+    throw runtime_error("TTF_Init Fail");
 }
 
-Window::Window(Point _size, std::string title) : size(_size) {
+Window::Window(int _width, int _height, std::string title)
+    : width(_width), height(_height) {
   init();
-  SDL_CreateWindowAndRenderer(size.x, size.y, 0, &win, &renderer);
+  SDL_CreateWindowAndRenderer(width, height, 0, &win, &renderer);
   if (win == NULL || renderer == NULL)
-    throw string("Window could not be created! SDL_Error: ") + SDL_GetError();
+    throw runtime_error(string("Window could not be created! SDL_Error: ") +
+                        SDL_GetError());
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
   SDL_SetWindowTitle(win, title.c_str());
+
   update_screen();
 }
 
@@ -102,7 +106,8 @@ Window::~Window() {
 }
 
 Window &Window::operator=(const Window &window) {
-  size = window.size;
+  width = window.width;
+  height = window.height;
   return *this;
 }
 
@@ -120,7 +125,7 @@ void Window::show_text(string input, Point src, RGB color, string font_addr,
     font = TTF_OpenFont(font_addr.c_str(), size);
     fonts_cache[font_addr + ":" + ss.str()] = font;
     if (font == NULL)
-      throw "Font Not Found: " + font_addr;
+      throw runtime_error("Font Not Found: " + font_addr);
   }
   SDL_Surface *textSurface =
       TTF_RenderText_Solid(font, input.c_str(), textColor);
@@ -140,26 +145,35 @@ void Window::clear() {
   SDL_RenderClear(renderer);
 }
 
-void Window::draw_img(string filename, Point src, Point size, double angle,
+void Window::draw_img(string filename, Rectangle dest, double angle,
                       bool flip_horizontal, bool flip_vertical) {
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
+    if (res == NULL)
+      throw runtime_error("Failed to load image: \"" + filename + "\". " +
+                          "make sure you are using the correct address.");
     texture_cache[filename] = res;
   }
   SDL_RendererFlip flip = (SDL_RendererFlip)(
       (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
-  SDL_Rect dst = {src.x, src.y, size.x ? size.x : this->size.x,
-                  size.y ? size.y : this->size.y};
+  SDL_Rect dst = {dest.x, dest.y, dest.w ? dest.w : this->width,
+                  dest.h ? dest.h : this->height};
   SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
+}
+
+void Window::draw_img(string filename, double angle, bool flip_horizontal,
+                      bool flip_vertical) {
+  draw_img(filename, Rectangle(0, 0, this->width, this->height), angle,
+           flip_horizontal, flip_vertical);
 }
 
 void Window::update_screen() { SDL_RenderPresent(renderer); }
 
-void Window::fill_rect(Point src, Point size, RGB color) {
+void Window::fill_rect(Rectangle rect, RGB color) {
   set_color(color);
-  SDL_Rect r = {src.x, src.y, size.x, size.y};
+  SDL_Rect r = {rect.x, rect.y, rect.w, rect.h};
   SDL_RenderFillRect(renderer, &r);
 }
 
@@ -173,13 +187,16 @@ void Window::draw_point(Point p, RGB color) {
   SDL_RenderDrawPoint(renderer, p.x, p.y);
 }
 
-void Window::draw_rect(Point src, Point size, RGB color,
-                       unsigned int line_width) {
+void Window::draw_rect(Rectangle rect, RGB color, unsigned int line_width) {
+  Point top_left = Point(rect.x, rect.y);
+  Point bottom_right = Point(rect.x + rect.w, rect.y + rect.h);
   for (size_t i = 0; i < line_width; i++) {
-    draw_line(src + Point(i, i), src + Point(size.x - i, i), color);
-    draw_line(src + Point(i, i), src + Point(i, size.y - i), color);
-    draw_line(src + Point(i, size.y - i), src + size - Point(i, i), color);
-    draw_line(src + Point(size.x - i, i), src + size - Point(i, i), color);
+    draw_line(top_left + Point(i, i), top_left + Point(rect.w - i, i), color);
+    draw_line(top_left + Point(i, i), top_left + Point(i, rect.h - i), color);
+    draw_line(top_left + Point(i, rect.h - i), bottom_right - Point(i, i),
+              color);
+    draw_line(top_left + Point(rect.w - i, i), bottom_right - Point(i, i),
+              color);
   }
 }
 
@@ -200,11 +217,13 @@ void Window::fill_circle(Point center, int r, RGB color) {
   }
 }
 
+bool Window::has_pending_event() { return SDL_PollEvent(NULL); }
+
 Event Window::poll_for_event() {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) {
     Event e(event);
-    if (e.get_type() != 0)
+    if (e.get_type() != Event::NA)
       return e;
   }
   return event;
@@ -212,7 +231,7 @@ Event Window::poll_for_event() {
 
 RGB::RGB(int r, int g, int b) {
   if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
-    throw "Invalid RGB Color";
+    throw logic_error("Invalid RGB Color");
   red = r;
   green = g;
   blue = b;
@@ -261,5 +280,29 @@ Point::operator SDL_Point() {
 
 ostream &operator<<(ostream &stream, const Point p) {
   stream << '(' << p.x << ", " << p.y << ')';
+  return stream;
+}
+
+Rectangle::Rectangle(int _x, int _y, int _w, int _h) { init(_x, _y, _w, _h); }
+
+Rectangle::Rectangle(Point top_left, Point bottom_right) {
+  init(top_left.x, top_left.y, bottom_right.x - top_left.x,
+       bottom_right.y - top_left.y);
+}
+
+Rectangle::Rectangle(Point top_left, int w, int h) {
+  init(top_left.x, top_left.y, w, h);
+}
+
+void Rectangle::init(int _x, int _y, int _w, int _h) {
+  x = _x;
+  y = _y;
+  w = _w;
+  h = _h;
+}
+
+std::ostream &operator<<(std::ostream &stream, const Rectangle r) {
+  stream << "(x: " << r.x << ", y: " << r.y << ", w: " << r.w << ", h: " << r.h
+         << ")";
   return stream;
 }

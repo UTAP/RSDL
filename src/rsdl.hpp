@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <map>
+#include <stdexcept>
 #include <string>
 
 struct Point {
@@ -26,6 +27,18 @@ struct Point {
 };
 Point operator*(const int, const Point);
 std::ostream &operator<<(std::ostream &stream, const Point);
+
+struct Rectangle {
+  Rectangle(int x, int y, int w, int h);
+  Rectangle(Point top_left, Point bottom_right);
+  Rectangle(Point top_left, int w, int h);
+
+  int x, y, w, h;
+
+private:
+  void init(int x, int y, int w, int h);
+};
+std::ostream &operator<<(std::ostream &stream, const Rectangle);
 
 struct RGB {
   RGB(int r, int g, int b);
@@ -46,7 +59,7 @@ const RGB BLACK(0, 0, 0);
 class Event {
 public:
   Event();
-  Event(SDL_Event _sdlEvent);
+  Event(SDL_Event _sdl_event);
   enum EventType {
     NA,
     LCLICK,
@@ -55,7 +68,8 @@ public:
     RRELEASE,
     MMOTION,
     KEY_PRESS,
-    QUIT
+    QUIT,
+    NO_EVENT
   };
   EventType get_type() const;
   Point get_mouse_position() const;
@@ -63,32 +77,34 @@ public:
   char get_pressed_key() const;
 
 protected:
-  SDL_Event sdlEvent;
+  SDL_Event sdl_event;
 };
 
 class Window {
 public:
-  Window(Point size = Point(640, 480), std::string title = "RSDL");
+  Window(int width = 640, int height = 480, std::string title = "RSDL");
   ~Window();
   Window &operator=(const Window &);
-  void draw_img(std::string filename, Point src = Point(0, 0),
-                Point size = Point(0, 0), double angle = 0,
+  void draw_img(std::string filename, Rectangle dest, double angle = 0,
+                bool flip_horizontal = false, bool flip_vertical = false);
+  void draw_img(std::string filename, double angle = 0,
                 bool flip_horizontal = false, bool flip_vertical = false);
   void show_text(std::string input, Point src, RGB color = WHITE,
                  std::string font_addr = "FreeSans.ttf", int size = 24);
   void draw_point(Point, RGB color = WHITE);
   void draw_line(Point src, Point dst, RGB color = WHITE);
-  void draw_rect(Point src, Point size, RGB color = WHITE,
+  void draw_rect(Rectangle rect, RGB color = WHITE,
                  unsigned int line_width = 4);
-  void fill_rect(Point src, Point size, RGB color = WHITE);
+  void fill_rect(Rectangle rect, RGB color = WHITE);
   void fill_circle(Point center, int radius, RGB color = WHITE);
   void update_screen();
   void clear();
+  bool has_pending_event();
   Event poll_for_event();
   void dump_err();
 
 protected:
-  Point size;
+  int width, height;
   SDL_Window *win;
   SDL_Renderer *renderer;
   std::map<std::string, SDL_Texture *> texture_cache;
