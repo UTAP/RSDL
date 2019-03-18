@@ -145,8 +145,8 @@ void Window::clear() {
   SDL_RenderClear(renderer);
 }
 
-void Window::draw_img(string filename, Rectangle dest, double angle,
-                      bool flip_horizontal, bool flip_vertical) {
+void Window::draw_img(string filename, Rectangle dst, Rectangle src, 
+                      double angle, bool flip_horizontal, bool flip_vertical) {
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
@@ -159,10 +159,13 @@ void Window::draw_img(string filename, Rectangle dest, double angle,
       (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
 
-  SDL_Rect sdl_dest = {dest.x, dest.y, dest.w, dest.h};
-  SDL_Rect* dest_ptr = (dest == NULL_RECT ? NULL : &sdl_dest);
+  SDL_Rect sdl_dst = {dst.x, dst.y, dst.w, dst.h};
+  SDL_Rect* dst_ptr = (dst == NULL_RECT ? NULL : &sdl_dst);
 
-  SDL_RenderCopyEx(renderer, res, NULL, dest_ptr, angle, NULL, flip);
+  SDL_Rect sdl_src = {src.x, src.y, src.w, src.h};
+  SDL_Rect* src_ptr = (src == NULL_RECT ? NULL : &sdl_src);
+
+  SDL_RenderCopyEx(renderer, res, src_ptr, dst_ptr, angle, NULL, flip);
 }
 
 void Window::update_screen() { SDL_RenderPresent(renderer); }
