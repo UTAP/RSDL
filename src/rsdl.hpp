@@ -103,8 +103,8 @@ public:
   bool has_pending_event();
   Event poll_for_event();
   void dump_err();
-  int get_height() const { return height };
-  int get_width() const { return width };
+  int get_height() const { return height; }
+  int get_width() const { return width; }
 
 protected:
   int width, height;
