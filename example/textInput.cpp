@@ -5,7 +5,7 @@ TextInputWindow::TextInputWindow(int _width, int _height)
     : width(_width), height(_height), img_background("example/assets/ut.png"),
       inputString((_width - text_input_width) / 2,
                   (_height - text_input_height) / 2, 30) {
-  win = new Window(Point(width, height), "RSDL Tutorial");
+  win = new Window(width, height, "RSDL Tutorial");
   enterPressed = false;
 }
 
@@ -28,8 +28,8 @@ void TextInputWindow::draw() {
   win->fill_circle(Point((width + text_input_width) / 2, height / 2),
                    text_input_height / 2, input_back_color);
   win->fill_rect(
-      Point((width - text_input_width) / 2, (height - text_input_height) / 2),
-      Point(text_input_width, text_input_height), input_back_color);
+      Rectangle((width - text_input_width) / 2, (height - text_input_height) / 2,
+                text_input_width, text_input_height), input_back_color);
   inputString.drawString(win);
   win->update_screen();
 }
