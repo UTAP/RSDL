@@ -292,8 +292,11 @@ Rectangle::Rectangle(int _x, int _y, int _w, int _h) {
 }
 
 Rectangle::Rectangle(Point top_left, Point bottom_right) {
-  x = top_left.x;
-  y = top_left.y;
-  w = bottom_right.x - top_left.x;
-  h = bottom_right.y - top_left.y;
+  Rectangle(top_left.x, top_left.y, 
+            bottom_right.x - top_left.x,
+            bottom_right.y - top_left.y);
+}
+
+Rectangle::Rectangle(Point top_left, int w, int h) {
+  Rectangle(top_left.x, top_left.y, w, h);
 }

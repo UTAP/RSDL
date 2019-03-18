@@ -30,6 +30,7 @@ std::ostream &operator<<(std::ostream &stream, const Point);
 struct Rectangle {
   Rectangle(int x, int y, int w, int h);
   Rectangle(Point top_left, Point bottom_right);
+  Rectangle(Point top_left, int w, int h);
 
   int x, y, w, h;
 };
