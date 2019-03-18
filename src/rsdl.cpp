@@ -163,6 +163,13 @@ void Window::draw_img(string filename, Rectangle dest, double angle,
   SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
 }
 
+
+void Window::draw_img(string filename, double angle,
+                      bool flip_horizontal, bool flip_vertical) {
+  draw_img(filename, Rectangle(0, 0, this->width, this->height),
+           angle, flip_horizontal, flip_vertical);
+}
+
 void Window::update_screen() { SDL_RenderPresent(renderer); }
 
 void Window::fill_rect(Rectangle rect, RGB color) {
