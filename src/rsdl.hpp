@@ -71,6 +71,7 @@ public:
     RRELEASE,
     MMOTION,
     KEY_PRESS,
+    KEY_RELEASE,
     QUIT,
     NO_EVENT
   };

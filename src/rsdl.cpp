@@ -22,6 +22,8 @@ Event::EventType Event::get_type() const {
       return RCLICK;
     if (e.type == SDL_KEYDOWN)
       return KEY_PRESS;
+    if (e.type == SDL_KEYUP)
+        return KEY_RELEASE;
     if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT)
       return LRELEASE;
     if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT)
