@@ -14,7 +14,7 @@ public:
   string textToDisplay();
   void eraseLastChar();
   void addChar(char c);
-  void drawString(Window *win);
+  void drawString(rsdl::Window *win);
   string getString();
 
 private:
