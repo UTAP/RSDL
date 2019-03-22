@@ -69,9 +69,9 @@ Point Event::get_relative_mouse_position() const {
 }
 
 char Event::get_pressed_key() const {
-  if (get_type() != KEY_PRESS)
+  if (get_type() != KEY_PRESS && get_type() != KEY_RELEASE)
     return -1;
-  return sdl_event.key.keysym.sym;
+  return (char)sdl_event.key.keysym.sym;
 }
 
 void Window::init() {
