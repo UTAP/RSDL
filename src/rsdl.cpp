@@ -292,6 +292,9 @@ void Window::play_sound_effect(std::string filename) {
   Mix_Chunk* chunk = sound_effects_cache[filename];
   if (chunk == NULL) {
     chunk = Mix_LoadWAV(filename.c_str());
+    if (chunk == NULL)
+      throw runtime_error(string("Failed to load sound effect: ") + filename +
+                          "Please make sure you are using the correct address.");
     sound_effects_cache[filename] = chunk;
   }
   Mix_PlayChannel(-1, chunk, 0);

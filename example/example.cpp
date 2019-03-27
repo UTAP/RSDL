@@ -18,7 +18,7 @@ struct Person {
   }
 };
 
-bool process_event(const Event &event, vector<Person> &persons) {
+bool process_event(const Event &event, vector<Person> &persons, Window* win) {
   static const string persons_names[] = {"Ghune", "Spartiate", "Athenian"};
   switch (event.get_type()) {
   case Event::QUIT:
@@ -26,6 +26,7 @@ bool process_event(const Event &event, vector<Person> &persons) {
   case Event::LCLICK:
     persons.push_back(Person(persons_names[rand() % 3], rand() % 2,
                              event.get_mouse_position()));
+    win->play_sound_effect("./example/assets/sound.wav");
     break;
   case Event::KEY_PRESS:
     if (event.get_pressed_key() == 'q')
@@ -56,7 +57,7 @@ int main(int argc, char const *argv[]) {
     Window win = Window();
     vector<Person> persons;
 
-    while (process_event(win.poll_for_event(), persons)) {
+    while (process_event(win.poll_for_event(), persons, &win)) {
       render(win, persons);
     }
   } catch (string exception) {
