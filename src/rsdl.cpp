@@ -284,6 +284,7 @@ void Window::pause_music() {
 void Window::stop_music() {
     Mix_HaltMusic();
     Mix_FreeMusic(music);
+    music = NULL;
     music_filename = "";
 }
 
