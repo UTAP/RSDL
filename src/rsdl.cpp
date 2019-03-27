@@ -79,15 +79,15 @@ void Window::init() {
     throw runtime_error("SDL Init Fail");
   int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS| SDL_INIT_AUDIO);
   if (SDL_WasInit(flags) != 0)
-    throw runtime_error(string("SDL_WasInit Failed ") + SDL_GetError());
+    throw runtime_error(string("SDL_WasInit Failed.") + SDL_GetError());
   if (SDL_InitSubSystem(flags) < 0)
-    throw runtime_error(string("SDL_InitSubSystem Failed ") + SDL_GetError());
+    throw runtime_error(string("SDL_InitSubSystem Failed.") + SDL_GetError());
   if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
     throw runtime_error("IMG_Init Fail");
   if (TTF_Init() == -1)
     throw runtime_error("TTF_Init Fail");
   if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
-    throw runtime_error(string("SDL_mixer could not initialize! SDL_mixer Error:") + Mix_GetError());
+    throw runtime_error(string("SDL_mixer could not initialize. SDL_mixer Error:") + Mix_GetError());
 }
 
 Window::Window(int _width, int _height, std::string title)
@@ -265,11 +265,13 @@ void Window::play_music(string filename) {
         }
     } else {
         music_filename = filename;
-        Mix_HaltMusic();
-        Mix_FreeMusic(music);
+        if (Mix_PlayingMusic() == 1) {
+            Mix_HaltMusic();
+            Mix_FreeMusic(music);
+        }
         music = Mix_LoadMUS(music_filename.c_str());
         if (music== NULL)
-            throw runtime_error(string("Failed to load beat music! SDL_mixer Error:") + Mix_GetError());
+            throw runtime_error(string("Failed to load music. SDL_mixer Error:") + Mix_GetError());
         Mix_PlayMusic(music, -1);
     }
 }
@@ -281,6 +283,8 @@ void Window::pause_music() {
 
 void Window::stop_music() {
     Mix_HaltMusic();
+    Mix_FreeMusic(music);
+    music_filename = "";
 }
 
 void Window::play_sound_effect(std::string filename) {
@@ -290,6 +294,10 @@ void Window::play_sound_effect(std::string filename) {
     sound_effects_cache[filename] = chunk;
   }
   Mix_PlayChannel(-1, chunk, 0);
+}
+
+void Window::resume_music() {
+    Mix_ResumeMusic();
 }
 
 Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }

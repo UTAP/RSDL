@@ -111,6 +111,7 @@ namespace rsdl {
     int get_width() const { return width; }
     void play_music(std::string filename);
     void pause_music();
+    void resume_music();
     void stop_music();
     void play_sound_effect(std::string filename);
 
