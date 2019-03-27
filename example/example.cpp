@@ -17,7 +17,7 @@ struct Person {
   }
 };
 
-bool process_event(const Event &event, vector<Person> &persons) {
+bool process_event(const Event &event, vector<Person> &persons, Window *win) {
   static const string persons_names[] = {"Ghune", "Spartiate", "Athenian"};
   switch (event.get_type()) {
   case Event::QUIT:
@@ -25,6 +25,7 @@ bool process_event(const Event &event, vector<Person> &persons) {
   case Event::LCLICK:
     persons.push_back(Person(persons_names[rand() % 3], rand() % 2,
                              event.get_mouse_position()));
+    win->play_sound_effect("./example/assets/sound.wav");
     break;
   case Event::KEY_PRESS:
     if (event.get_pressed_key() == 'q')
@@ -40,8 +41,8 @@ void render(Window &win, const vector<Person> &persons) {
   for (vector<Person>::const_iterator person = persons.begin();
        person != persons.end(); person++)
     win.draw_img("example/assets/" + person->name + ".png",
-                 Rectangle(person->pos, person->pos + person->size), 0,
-                 person->flipped);
+                 Rectangle(person->pos, person->pos + person->size), NULL_RECT,
+                 0, person->flipped);
   win.draw_img("example/assets/cursor.png",
                Rectangle(get_current_mouse_position() - Point(15, 15), 30, 30));
   win.update_screen();
@@ -55,7 +56,7 @@ int main(int argc, char const *argv[]) {
     Window win = Window();
     vector<Person> persons;
 
-    while (process_event(win.poll_for_event(), persons)) {
+    while (process_event(win.poll_for_event(), persons, &win)) {
       render(win, persons);
     }
   } catch (string exception) {

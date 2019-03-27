@@ -22,6 +22,8 @@ Event::EventType Event::get_type() const {
       return RCLICK;
     if (e.type == SDL_KEYDOWN)
       return KEY_PRESS;
+    if (e.type == SDL_KEYUP)
+      return KEY_RELEASE;
     if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT)
       return LRELEASE;
     if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT)
@@ -66,23 +68,27 @@ Point Event::get_relative_mouse_position() const {
 }
 
 char Event::get_pressed_key() const {
-  if (get_type() != KEY_PRESS)
+  if (get_type() != KEY_PRESS && get_type() != KEY_RELEASE)
     return -1;
-  return sdl_event.key.keysym.sym;
+  return (char)sdl_event.key.keysym.sym;
 }
 
 void Window::init() {
   if (SDL_Init(0) < 0)
     throw runtime_error("SDL Init Fail");
-  int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+  int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO);
   if (SDL_WasInit(flags) != 0)
-    throw runtime_error(string("SDL_WasInit Failed ") + SDL_GetError());
+    throw runtime_error(string("SDL_WasInit Failed.") + SDL_GetError());
   if (SDL_InitSubSystem(flags) < 0)
-    throw runtime_error(string("SDL_InitSubSystem Failed ") + SDL_GetError());
+    throw runtime_error(string("SDL_InitSubSystem Failed.") + SDL_GetError());
   if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
     throw runtime_error("IMG_Init Fail");
   if (TTF_Init() == -1)
     throw runtime_error("TTF_Init Fail");
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    throw runtime_error(
+        string("SDL_mixer could not initialize. SDL_mixer Error:") +
+        Mix_GetError());
 }
 
 Window::Window(int _width, int _height, std::string title)
@@ -94,14 +100,25 @@ Window::Window(int _width, int _height, std::string title)
                         SDL_GetError());
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
   SDL_SetWindowTitle(win, title.c_str());
-
   update_screen();
+
+  music = NULL;
 }
 
 Window::~Window() {
   SDL_DestroyWindow(win);
   if (TTF_WasInit())
     TTF_Quit();
+  if (music != NULL)
+    Mix_FreeMusic(music);
+
+  map<string, Mix_Chunk *>::iterator chunk_it;
+  for (chunk_it = sound_effects_cache.begin();
+       chunk_it != sound_effects_cache.end(); ++chunk_it) {
+    Mix_FreeChunk(chunk_it->second);
+  }
+
+  Mix_Quit();
   SDL_Quit();
 }
 
@@ -125,7 +142,7 @@ void Window::show_text(string input, Point src, RGB color, string font_addr,
     font = TTF_OpenFont(font_addr.c_str(), size);
     fonts_cache[font_addr + ":" + ss.str()] = font;
     if (font == NULL)
-      throw runtime_error("Font Not Found: " + font_addr);
+      throw runtime_error("Font not found: " + font_addr);
   }
   SDL_Surface *textSurface =
       TTF_RenderText_Solid(font, input.c_str(), textColor);
@@ -145,8 +162,8 @@ void Window::clear() {
   SDL_RenderClear(renderer);
 }
 
-void Window::draw_img(string filename, Rectangle dest, double angle,
-                      bool flip_horizontal, bool flip_vertical) {
+void Window::draw_img(string filename, Rectangle dst, Rectangle src,
+                      double angle, bool flip_horizontal, bool flip_vertical) {
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
     res = IMG_LoadTexture(renderer, filename.c_str());
@@ -158,15 +175,14 @@ void Window::draw_img(string filename, Rectangle dest, double angle,
   SDL_RendererFlip flip = (SDL_RendererFlip)(
       (flip_horizontal ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE) |
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
-  SDL_Rect dst = {dest.x, dest.y, dest.w ? dest.w : this->width,
-                  dest.h ? dest.h : this->height};
-  SDL_RenderCopyEx(renderer, res, NULL, &dst, angle, NULL, flip);
-}
 
-void Window::draw_img(string filename, double angle, bool flip_horizontal,
-                      bool flip_vertical) {
-  draw_img(filename, Rectangle(0, 0, this->width, this->height), angle,
-           flip_horizontal, flip_vertical);
+  SDL_Rect sdl_dst = {dst.x, dst.y, dst.w, dst.h};
+  SDL_Rect *dst_ptr = (dst == NULL_RECT ? NULL : &sdl_dst);
+
+  SDL_Rect sdl_src = {src.x, src.y, src.w, src.h};
+  SDL_Rect *src_ptr = (src == NULL_RECT ? NULL : &sdl_src);
+
+  SDL_RenderCopyEx(renderer, res, src_ptr, dst_ptr, angle, NULL, flip);
 }
 
 void Window::update_screen() { SDL_RenderPresent(renderer); }
@@ -241,6 +257,55 @@ Point::Point(int _x, int _y) : x(_x), y(_y) {}
 
 void Window::dump_err() { cerr << SDL_GetError() << endl; }
 
+void Window::play_music(string filename) {
+  if (filename == music_filename) {
+    if (Mix_PausedMusic() == 1) {
+      Mix_ResumeMusic();
+    } else {
+      Mix_HaltMusic();
+      Mix_PlayMusic(music, -1);
+    }
+  } else {
+    music_filename = filename;
+    if (Mix_PlayingMusic() == 1) {
+      Mix_HaltMusic();
+      Mix_FreeMusic(music);
+    }
+    music = Mix_LoadMUS(music_filename.c_str());
+    if (music == NULL)
+      throw runtime_error(string("Failed to load music. SDL_mixer Error:") +
+                          Mix_GetError());
+    Mix_PlayMusic(music, -1);
+  }
+}
+
+void Window::pause_music() {
+  if (Mix_PlayingMusic() == 1)
+    Mix_PauseMusic();
+}
+
+void Window::stop_music() {
+  Mix_HaltMusic();
+  Mix_FreeMusic(music);
+  music = NULL;
+  music_filename = "";
+}
+
+void Window::play_sound_effect(std::string filename) {
+  Mix_Chunk *chunk = sound_effects_cache[filename];
+  if (chunk == NULL) {
+    chunk = Mix_LoadWAV(filename.c_str());
+    if (chunk == NULL)
+      throw runtime_error(
+          string("Failed to load sound effect: ") + filename +
+          "Please make sure you are using the correct address.");
+    sound_effects_cache[filename] = chunk;
+  }
+  Mix_PlayChannel(-1, chunk, 0);
+}
+
+void Window::resume_music() { Mix_ResumeMusic(); }
+
 Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }
 
 Point Point::operator-(const Point p) const { return (*this) + (-1) * p; }
@@ -299,6 +364,12 @@ void Rectangle::init(int _x, int _y, int _w, int _h) {
   y = _y;
   w = _w;
   h = _h;
+}
+
+Rectangle NULL_RECT(-1, -1, -1, -1);
+
+bool Rectangle::operator==(const Rectangle &r) {
+  return x == r.x && y == r.y && w == r.w && h == r.h;
 }
 
 std::ostream &operator<<(std::ostream &stream, const Rectangle r) {

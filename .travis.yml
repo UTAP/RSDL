@@ -15,7 +15,7 @@ matrix:
     - 
       before_install: 
         - "sudo apt-get update"
-        - "sudo apt-get install -y g++ make libegl1-mesa-dev libgles2-mesa-dev libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev"
+        - "sudo apt-get install -y g++ make libegl1-mesa-dev libgles2-mesa-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev"
       env: 
         - "MATRIX_EVAL=\"TESTENV=build && CC=gcc && CXX=g++\""
       os: linux
@@ -23,7 +23,7 @@ matrix:
         - make
     - 
       before_install: 
-        - "brew install sdl2 sdl2_image sdl2_ttf"
+        - "brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf"
       env: 
         - "MATRIX_EVAL=\"TESTENV=build && brew install gcc &&  CC=gcc-7 && CXX=g++-7\""
       os: osx
