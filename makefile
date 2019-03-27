@@ -1,5 +1,5 @@
 CC := g++
-CCFLAGS += -l SDL2 -l SDL2_image -l SDL2_ttf
+CCFLAGS += -l SDL2 -l SDL2_image -l SDL2_ttf -l SDL2_mixer
 
 all: test.out example.out
 

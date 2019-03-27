@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -108,13 +109,20 @@ namespace rsdl {
     void dump_err();
     int get_height() const { return height; }
     int get_width() const { return width; }
+    void play_music(std::string filename);
+    void pause_music();
+    void stop_music();
+    void play_sound_effect(std::string filename);
 
   protected:
     int width, height;
     SDL_Window *win;
     SDL_Renderer *renderer;
+    Mix_Music *music;
+    std::string music_filename;
     std::map<std::string, SDL_Texture *> texture_cache;
     std::map<std::string, TTF_Font *> fonts_cache;
+    std::map<std::string, Mix_Chunk*> sound_effects_cache;
     void set_color(RGB color);
     void init();
   };

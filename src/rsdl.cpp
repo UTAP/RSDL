@@ -77,7 +77,7 @@ char Event::get_pressed_key() const {
 void Window::init() {
   if (SDL_Init(0) < 0)
     throw runtime_error("SDL Init Fail");
-  int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+  int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS| SDL_INIT_AUDIO);
   if (SDL_WasInit(flags) != 0)
     throw runtime_error(string("SDL_WasInit Failed ") + SDL_GetError());
   if (SDL_InitSubSystem(flags) < 0)
@@ -86,6 +86,8 @@ void Window::init() {
     throw runtime_error("IMG_Init Fail");
   if (TTF_Init() == -1)
     throw runtime_error("TTF_Init Fail");
+  if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+    throw runtime_error(string("SDL_mixer could not initialize! SDL_mixer Error:") + Mix_GetError());
 }
 
 Window::Window(int _width, int _height, std::string title)
@@ -97,14 +99,24 @@ Window::Window(int _width, int _height, std::string title)
                         SDL_GetError());
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
   SDL_SetWindowTitle(win, title.c_str());
-
   update_screen();
+
+  music = NULL;
 }
 
 Window::~Window() {
   SDL_DestroyWindow(win);
   if (TTF_WasInit())
     TTF_Quit();
+  if (music != NULL)
+    Mix_FreeMusic(music);
+
+  map<string, Mix_Chunk*>::iterator chunk_it;
+  for (chunk_it = sound_effects_cache.begin(); chunk_it != sound_effects_cache.end(); ++chunk_it) {
+    Mix_FreeChunk(chunk_it->second);
+  }
+
+  Mix_Quit();
   SDL_Quit();
 }
 
@@ -128,7 +140,7 @@ void Window::show_text(string input, Point src, RGB color, string font_addr,
     font = TTF_OpenFont(font_addr.c_str(), size);
     fonts_cache[font_addr + ":" + ss.str()] = font;
     if (font == NULL)
-      throw runtime_error("Font Not Found: " + font_addr);
+      throw runtime_error("Font not found: " + font_addr);
   }
   SDL_Surface *textSurface =
       TTF_RenderText_Solid(font, input.c_str(), textColor);
@@ -242,6 +254,43 @@ RGB::RGB(int r, int g, int b) {
 Point::Point(int _x, int _y) : x(_x), y(_y) {}
 
 void Window::dump_err() { cerr << SDL_GetError() << endl; }
+
+void Window::play_music(string filename) {
+    if (filename == music_filename) {
+        if (Mix_PausedMusic() == 1) {
+            Mix_ResumeMusic();
+        } else {
+            Mix_HaltMusic();
+            Mix_PlayMusic(music, -1);
+        }
+    } else {
+        music_filename = filename;
+        Mix_HaltMusic();
+        Mix_FreeMusic(music);
+        music = Mix_LoadMUS(music_filename.c_str());
+        if (music== NULL)
+            throw runtime_error(string("Failed to load beat music! SDL_mixer Error:") + Mix_GetError());
+        Mix_PlayMusic(music, -1);
+    }
+}
+
+void Window::pause_music() {
+    if (Mix_PlayingMusic() == 1)
+        Mix_PauseMusic();
+}
+
+void Window::stop_music() {
+    Mix_HaltMusic();
+}
+
+void Window::play_sound_effect(std::string filename) {
+  Mix_Chunk* chunk = sound_effects_cache[filename];
+  if (chunk == NULL) {
+    chunk = Mix_LoadWAV(filename.c_str());
+    sound_effects_cache[filename] = chunk;
+  }
+  Mix_PlayChannel(-1, chunk, 0);
+}
 
 Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }
 
