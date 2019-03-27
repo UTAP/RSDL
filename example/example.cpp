@@ -18,7 +18,7 @@ struct Person {
   }
 };
 
-bool process_event(const Event &event, vector<Person> &persons, Window* win) {
+bool process_event(const Event &event, vector<Person> &persons, Window *win) {
   static const string persons_names[] = {"Ghune", "Spartiate", "Athenian"};
   switch (event.get_type()) {
   case Event::QUIT:
@@ -41,9 +41,9 @@ void render(Window &win, const vector<Person> &persons) {
   win.draw_img("example/assets/back.png");
   for (vector<Person>::const_iterator person = persons.begin();
        person != persons.end(); person++)
-    win.draw_img("example/assets/" + person->name + ".png", 
-                 Rectangle(person->pos, person->pos + person->size),
-                 NULL_RECT, 0, person->flipped);
+    win.draw_img("example/assets/" + person->name + ".png",
+                 Rectangle(person->pos, person->pos + person->size), NULL_RECT,
+                 0, person->flipped);
   win.draw_img("example/assets/cursor.png",
                Rectangle(get_current_mouse_position() - Point(15, 15), 30, 30));
   win.update_screen();

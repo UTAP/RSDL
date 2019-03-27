@@ -24,7 +24,7 @@ Event::EventType Event::get_type() const {
     if (e.type == SDL_KEYDOWN)
       return KEY_PRESS;
     if (e.type == SDL_KEYUP)
-        return KEY_RELEASE;
+      return KEY_RELEASE;
     if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT)
       return LRELEASE;
     if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT)
@@ -77,7 +77,7 @@ char Event::get_pressed_key() const {
 void Window::init() {
   if (SDL_Init(0) < 0)
     throw runtime_error("SDL Init Fail");
-  int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS| SDL_INIT_AUDIO);
+  int flags = (SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO);
   if (SDL_WasInit(flags) != 0)
     throw runtime_error(string("SDL_WasInit Failed.") + SDL_GetError());
   if (SDL_InitSubSystem(flags) < 0)
@@ -86,8 +86,10 @@ void Window::init() {
     throw runtime_error("IMG_Init Fail");
   if (TTF_Init() == -1)
     throw runtime_error("TTF_Init Fail");
-  if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
-    throw runtime_error(string("SDL_mixer could not initialize. SDL_mixer Error:") + Mix_GetError());
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    throw runtime_error(
+        string("SDL_mixer could not initialize. SDL_mixer Error:") +
+        Mix_GetError());
 }
 
 Window::Window(int _width, int _height, std::string title)
@@ -111,8 +113,9 @@ Window::~Window() {
   if (music != NULL)
     Mix_FreeMusic(music);
 
-  map<string, Mix_Chunk*>::iterator chunk_it;
-  for (chunk_it = sound_effects_cache.begin(); chunk_it != sound_effects_cache.end(); ++chunk_it) {
+  map<string, Mix_Chunk *>::iterator chunk_it;
+  for (chunk_it = sound_effects_cache.begin();
+       chunk_it != sound_effects_cache.end(); ++chunk_it) {
     Mix_FreeChunk(chunk_it->second);
   }
 
@@ -160,7 +163,7 @@ void Window::clear() {
   SDL_RenderClear(renderer);
 }
 
-void Window::draw_img(string filename, Rectangle dst, Rectangle src, 
+void Window::draw_img(string filename, Rectangle dst, Rectangle src,
                       double angle, bool flip_horizontal, bool flip_vertical) {
   SDL_Texture *res = texture_cache[filename];
   if (res == NULL) {
@@ -175,10 +178,10 @@ void Window::draw_img(string filename, Rectangle dst, Rectangle src,
       (flip_vertical ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE));
 
   SDL_Rect sdl_dst = {dst.x, dst.y, dst.w, dst.h};
-  SDL_Rect* dst_ptr = (dst == NULL_RECT ? NULL : &sdl_dst);
+  SDL_Rect *dst_ptr = (dst == NULL_RECT ? NULL : &sdl_dst);
 
   SDL_Rect sdl_src = {src.x, src.y, src.w, src.h};
-  SDL_Rect* src_ptr = (src == NULL_RECT ? NULL : &sdl_src);
+  SDL_Rect *src_ptr = (src == NULL_RECT ? NULL : &sdl_src);
 
   SDL_RenderCopyEx(renderer, res, src_ptr, dst_ptr, angle, NULL, flip);
 }
@@ -256,53 +259,53 @@ Point::Point(int _x, int _y) : x(_x), y(_y) {}
 void Window::dump_err() { cerr << SDL_GetError() << endl; }
 
 void Window::play_music(string filename) {
-    if (filename == music_filename) {
-        if (Mix_PausedMusic() == 1) {
-            Mix_ResumeMusic();
-        } else {
-            Mix_HaltMusic();
-            Mix_PlayMusic(music, -1);
-        }
+  if (filename == music_filename) {
+    if (Mix_PausedMusic() == 1) {
+      Mix_ResumeMusic();
     } else {
-        music_filename = filename;
-        if (Mix_PlayingMusic() == 1) {
-            Mix_HaltMusic();
-            Mix_FreeMusic(music);
-        }
-        music = Mix_LoadMUS(music_filename.c_str());
-        if (music== NULL)
-            throw runtime_error(string("Failed to load music. SDL_mixer Error:") + Mix_GetError());
-        Mix_PlayMusic(music, -1);
+      Mix_HaltMusic();
+      Mix_PlayMusic(music, -1);
     }
+  } else {
+    music_filename = filename;
+    if (Mix_PlayingMusic() == 1) {
+      Mix_HaltMusic();
+      Mix_FreeMusic(music);
+    }
+    music = Mix_LoadMUS(music_filename.c_str());
+    if (music == NULL)
+      throw runtime_error(string("Failed to load music. SDL_mixer Error:") +
+                          Mix_GetError());
+    Mix_PlayMusic(music, -1);
+  }
 }
 
 void Window::pause_music() {
-    if (Mix_PlayingMusic() == 1)
-        Mix_PauseMusic();
+  if (Mix_PlayingMusic() == 1)
+    Mix_PauseMusic();
 }
 
 void Window::stop_music() {
-    Mix_HaltMusic();
-    Mix_FreeMusic(music);
-    music = NULL;
-    music_filename = "";
+  Mix_HaltMusic();
+  Mix_FreeMusic(music);
+  music = NULL;
+  music_filename = "";
 }
 
 void Window::play_sound_effect(std::string filename) {
-  Mix_Chunk* chunk = sound_effects_cache[filename];
+  Mix_Chunk *chunk = sound_effects_cache[filename];
   if (chunk == NULL) {
     chunk = Mix_LoadWAV(filename.c_str());
     if (chunk == NULL)
-      throw runtime_error(string("Failed to load sound effect: ") + filename +
-                          "Please make sure you are using the correct address.");
+      throw runtime_error(
+          string("Failed to load sound effect: ") + filename +
+          "Please make sure you are using the correct address.");
     sound_effects_cache[filename] = chunk;
   }
   Mix_PlayChannel(-1, chunk, 0);
 }
 
-void Window::resume_music() {
-    Mix_ResumeMusic();
-}
+void Window::resume_music() { Mix_ResumeMusic(); }
 
 Point Point::operator+(const Point p) const { return Point(x + p.x, y + p.y); }
 
@@ -364,9 +367,9 @@ void Rectangle::init(int _x, int _y, int _w, int _h) {
   h = _h;
 }
 
-Rectangle rsdl::NULL_RECT(-1,-1,-1,-1);
+Rectangle rsdl::NULL_RECT(-1, -1, -1, -1);
 
-bool Rectangle::operator==(const Rectangle& r) {
+bool Rectangle::operator==(const Rectangle &r) {
   return x == r.x && y == r.y && w == r.w && h == r.h;
 }
 
