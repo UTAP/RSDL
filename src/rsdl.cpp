@@ -4,9 +4,8 @@
 #include <sstream>
 
 using namespace std;
-using namespace rsdl;
 
-void rsdl::delay(int millisecond) { SDL_Delay(millisecond); }
+void delay(int millisecond) { SDL_Delay(millisecond); }
 
 Event::Event() {}
 
@@ -53,7 +52,7 @@ Point Event::get_mouse_position() const {
   }
 }
 
-Point rsdl::get_current_mouse_position() {
+Point get_current_mouse_position() {
   Point ret(0, 0);
   SDL_GetMouseState(&ret.x, &ret.y);
   return ret;
@@ -315,7 +314,7 @@ Point Point::operator*(const int c) const { return Point(x * c, y * c); }
 
 Point Point::operator/(const int c) const { return Point(x / c, y / c); }
 
-Point rsdl::operator*(const int c, const Point p) { return p * c; }
+Point operator*(const int c, const Point p) { return p * c; }
 
 Point &Point::operator+=(const Point p) {
   (*this) = (*this) + p;
@@ -344,7 +343,7 @@ Point::operator SDL_Point() {
   return ret;
 }
 
-ostream &rsdl::operator<<(ostream &stream, const Point p) {
+ostream &operator<<(ostream &stream, const Point p) {
   stream << '(' << p.x << ", " << p.y << ')';
   return stream;
 }
@@ -367,13 +366,13 @@ void Rectangle::init(int _x, int _y, int _w, int _h) {
   h = _h;
 }
 
-Rectangle rsdl::NULL_RECT(-1, -1, -1, -1);
+Rectangle NULL_RECT(-1, -1, -1, -1);
 
 bool Rectangle::operator==(const Rectangle &r) {
   return x == r.x && y == r.y && w == r.w && h == r.h;
 }
 
-std::ostream &rsdl::operator<<(std::ostream &stream, const Rectangle r) {
+std::ostream &operator<<(std::ostream &stream, const Rectangle r) {
   stream << "(x: " << r.x << ", y: " << r.y << ", w: " << r.w << ", h: " << r.h
          << ")";
   return stream;

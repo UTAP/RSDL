@@ -5,7 +5,6 @@
 #include <vector>
 
 using namespace std;
-using namespace rsdl;
 
 struct Person {
   string name;

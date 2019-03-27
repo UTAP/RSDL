@@ -1,7 +1,5 @@
 #include "myString.hpp"
 
-using namespace rsdl;
-
 MyString::MyString(int _x, int _y, int _fontSize)
     : x(_x), y(_y), fontSize(_fontSize) {}
 

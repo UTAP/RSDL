@@ -13,8 +13,8 @@ using namespace std;
 
 class TextInputWindow {
 private:
-  rsdl::Window *win;
-  rsdl::Event lastEvent;
+  Window *win;
+  Event lastEvent;
   MyString inputString;
   int width;
   int height;

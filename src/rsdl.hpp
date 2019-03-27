@@ -12,8 +12,6 @@
 #include <stdexcept>
 #include <string>
 
-namespace rsdl {
-
 struct Point {
   Point(int x, int y);
   int x;
@@ -131,7 +129,5 @@ protected:
 
 void delay(int millisecond);
 Point get_current_mouse_position();
-
-} // namespace rsdl
 
 #endif
