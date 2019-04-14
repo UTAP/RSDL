@@ -16,7 +16,7 @@ void MyString::addChar(char c) {
 }
 
 void MyString::drawString(Window *win) {
-  win->show_text(textToDisplay(), Point(x, y), WHITE, FONT_FREESANS, fontSize);
+  win->show_text(textToDisplay(), Point(x, y), WHITE, FONT_SANSSERIF, fontSize);
 }
 
 string MyString::getString() { return inputString; }

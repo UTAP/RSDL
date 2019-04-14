@@ -6,7 +6,7 @@
 using namespace std;
 
 #define MAX_STRING_LENGTH 10
-#define FONT_FREESANS "example/assets/OpenSans.ttf"
+#define FONT_SANSSERIF "example/assets/OpenSans.ttf"
 
 class MyString {
 public:
