@@ -103,6 +103,12 @@ Window::Window(int _width, int _height, std::string title)
   update_screen();
 
   music = NULL;
+
+  // The following line of code was added to remedy the problem where 
+  // the SDL window would malfunction for approximately the first 5ms 
+  // after creation. it appears that the window requires some time to
+  // set up, and the 10ms delay seems to solve the problem consistently.
+  delay(10);
 }
 
 Window::~Window() {
