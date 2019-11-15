@@ -14,6 +14,7 @@
 
 struct Point {
   Point(int x, int y);
+  Point() = default;
   int x;
   int y;
   Point operator+(const Point) const;
