@@ -22,10 +22,17 @@ matrix:
       script: 
         - make
     - 
-      before_install: 
-        - "brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf"
+      addons:
+        homebrew:
+          packages:
+            - gcc
+            - sdl2
+            - sdl2_image
+            - sdl2_mixer
+            - sdl2_ttf
+          update: true
       env: 
-        - "MATRIX_EVAL=\"TESTENV=build && brew install gcc &&  CC=gcc-7 && CXX=g++-7\""
+        - "MATRIX_EVAL=\"TESTENV=build && CC=gcc-9 && CXX=g++-9\""
       os: osx
       script: 
         - make
